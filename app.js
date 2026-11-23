@@ -382,7 +382,7 @@ function createBoard(root, level) {
     </div>
     <div class="section-block">
       <h2>1️⃣ 활동 카드 고르기 · How often do you ___? <span class="count act-count"></span></h2>
-      <p class="hint">카드를 누르면 위의 질문이 바뀌어요. <b>📘</b> 표시는 교과서 표현이에요.</p>
+      <p class="hint">카드를 누르면 위의 질문이 바뀌어요. <b>📘</b> 는 교과서 표현, <b>🧒</b> 는 우리 생활 표현이에요.</p>
       <div class="cat-switch"></div>
       <div class="card-grid act-grid"></div>
     </div>`;
@@ -524,7 +524,7 @@ function createBoard(root, level) {
   function renderFilters() {
     const wrap = $(".cat-switch");
     wrap.innerHTML = "";
-    [{ key: "all", label: "전체" }, { key: "book", label: "📘 교과서 표현" }, ...ACT_CATS].forEach(c => {
+    [{ key: "all", label: "전체" }, { key: "book", label: "📘 교과서 표현" }, { key: "life", label: "🧒 우리 생활 20" }, ...ACT_CATS].forEach(c => {
       const b = document.createElement("button");
       b.className = "cat-btn" + (cat === c.key ? " active" : "");
       b.textContent = c.label;
@@ -549,14 +549,14 @@ function createBoard(root, level) {
   }
   function renderCards() {
     grid.innerHTML = "";
-    const list = acts.filter(a => cat === "all" || (cat === "book" ? a.book : a.cat === cat));
+    const list = acts.filter(a => cat === "all" || (cat === "book" ? a.book : cat === "life" ? a.life : a.cat === cat));
     list.forEach((a, i) => {
       const card = document.createElement("button");
       card.className = "card act-card tone-" + (i % 6) + (a.book ? " textbook" : "");
       card.dataset.act = a.id;
       const tag = document.createElement("span");
       tag.className = "card-tag";
-      tag.textContent = (a.book ? "📘 " : "") + catLabel(a.cat);
+      tag.textContent = (a.book ? "📘 " : a.life ? "🧒 " : "") + catLabel(a.cat);
       const q = document.createElement("div");
       q.className = "act-q";
       q.innerHTML = `<b>${a.q}</b><span>${a.koQ.replace(/니$/, "기")}</span>`;

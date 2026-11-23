@@ -29,6 +29,7 @@ const ACT_CATS = [
  *        less = 이만큼보다 많으면 less often / 적으면 Good for you!
  *        (없으면 Sounds fun! 같은 반응)
  * book : 📘 교과서 표현
+ * life : 🧒 우리 생활 표현 (교과서 밖, 초등학생 생활과 가까운 표현 20개)
  * rec  : 자연스러운 빈도 예시 (랜덤 · 퀴즈에 사용)
  */
 const ACTIVITIES = [
@@ -74,6 +75,27 @@ const ACTIVITIES = [
   { id: "camping",    emoji: "⛺", cat: "out",    lv: 2, q: "go camping",            a: "go camping",            koQ: "캠핑하러 가니",          koA: "캠핑하러 가",          rec: [3, "year"] },
   { id: "hiking",     emoji: "⛰️", cat: "out",    lv: 2, q: "go hiking",             a: "go hiking",             koQ: "등산하러 가니",          koA: "등산하러 가",          rec: [1, "month"] },
   { id: "fishing",    emoji: "🎣", cat: "out",    lv: 2, q: "go fishing",            a: "go fishing",            koQ: "낚시하러 가니",          koA: "낚시하러 가",          rec: [2, "year"] },
+  /* 🧒 우리 생활 표현 20개 (life: true) — 교과서 밖, 초등학생 생활과 가까운 표현 */
+  { id: "breakfast",  emoji: "🍳", cat: "health", lv: 1, life: true, q: "eat breakfast",          a: "eat breakfast",          koQ: "아침밥을 먹니",            koA: "아침밥을 먹어",            rule: { good: 6 },  rec: [5, "week"] },
+  { id: "youtube",    emoji: "▶️", cat: "home",   lv: 1, life: true, q: "watch YouTube",          a: "watch YouTube",          koQ: "유튜브를 보니",            koA: "유튜브를 봐",              rule: { less: 7 },  rec: [1, "day"] },
+  { id: "math",       emoji: "➕", cat: "home",   lv: 1, life: true, q: "study math",             a: "study math",             koQ: "수학 공부를 하니",         koA: "수학 공부를 해",           rule: { good: 3 },  rec: [3, "week"] },
+  { id: "diary",      emoji: "📔", cat: "home",   lv: 1, life: true, q: "write in your diary",    a: "write in my diary",      koQ: "일기를 쓰니",              koA: "일기를 써",                rule: { good: 2 },  rec: [2, "week"] },
+  { id: "dog",        emoji: "🐶", cat: "home",   lv: 1, life: true, q: "walk your dog",          a: "walk my dog",            koQ: "강아지를 산책시키니",      koA: "강아지를 산책시켜",        rec: [1, "day"] },
+  { id: "coding",     emoji: "💻", cat: "home",   lv: 1, life: true, q: "learn coding",           a: "learn coding",           koQ: "코딩을 배우니",            koA: "코딩을 배워",              rec: [1, "week"] },
+  { id: "photos",     emoji: "📸", cat: "home",   lv: 1, life: true, q: "take pictures",          a: "take pictures",          koQ: "사진을 찍니",              koA: "사진을 찍어",              rec: [2, "day"] },
+  { id: "boardgame",  emoji: "🎲", cat: "home",   lv: 1, life: true, q: "play board games",       a: "play board games",       koQ: "보드게임을 하니",          koA: "보드게임을 해",            rec: [1, "week"] },
+  { id: "cookies",    emoji: "🍪", cat: "home",   lv: 2, life: true, q: "bake cookies",           a: "bake cookies",           koQ: "쿠키를 굽니",              koA: "쿠키를 구워",              rec: [1, "month"] },
+  { id: "basketball", emoji: "🏀", cat: "sports", lv: 1, life: true, q: "play basketball",        a: "play basketball",        koQ: "농구를 하니",              koA: "농구를 해",                rec: [2, "week"] },
+  { id: "dodgeball",  emoji: "🔴", cat: "sports", lv: 1, life: true, q: "play dodgeball",         a: "play dodgeball",         koQ: "피구를 하니",              koA: "피구를 해",                rec: [1, "week"] },
+  { id: "dance",      emoji: "💃", cat: "sports", lv: 1, life: true, q: "dance to K-pop",         a: "dance to K-pop",         koQ: "케이팝에 맞춰 춤을 추니",  koA: "케이팝에 맞춰 춤을 춰",    rec: [3, "week"] },
+  { id: "sing",       emoji: "🎤", cat: "sports", lv: 1, life: true, q: "sing songs",             a: "sing songs",             koQ: "노래를 부르니",            koA: "노래를 불러",              rec: [1, "day"] },
+  { id: "roller",     emoji: "🛼", cat: "sports", lv: 2, life: true, q: "go roller skating",      a: "go roller skating",      koQ: "롤러스케이트를 타러 가니", koA: "롤러스케이트를 타러 가",   rec: [2, "month"] },
+  { id: "trampoline", emoji: "🤸", cat: "sports", lv: 2, life: true, q: "jump on a trampoline",   a: "jump on a trampoline",   koQ: "트램펄린에서 뛰니",        koA: "트램펄린에서 뛰어",        rec: [2, "month"] },
+  { id: "kite",       emoji: "🪁", cat: "sports", lv: 2, life: true, q: "fly a kite",             a: "fly a kite",             koQ: "연을 날리니",              koA: "연을 날려",                rec: [1, "year"] },
+  { id: "karaoke",    emoji: "🎶", cat: "out",    lv: 1, life: true, q: "go to a karaoke room",   a: "go to a karaoke room",   koQ: "코인노래방에 가니",        koA: "코인노래방에 가",          rec: [2, "month"] },
+  { id: "amusement",  emoji: "🎢", cat: "out",    lv: 2, life: true, q: "go to an amusement park", a: "go to an amusement park", koQ: "놀이공원에 가니",        koA: "놀이공원에 가",            rec: [2, "year"] },
+  { id: "waterpark",  emoji: "🌊", cat: "out",    lv: 2, life: true, q: "go to a water park",     a: "go to a water park",     koQ: "워터파크에 가니",          koA: "워터파크에 가",            rec: [1, "year"] },
+  { id: "sleepover",  emoji: "🛌", cat: "out",    lv: 2, life: true, q: "have a sleepover",       a: "have a sleepover",       koQ: "친구랑 파자마 파티를 하니", koA: "친구랑 파자마 파티를 해", rec: [2, "year"] },
 ];
 
 /* ===== 빈도 표현 ===== */
@@ -188,4 +210,10 @@ const WORD_MEANINGS = {
   family: "가족", friends: "친구들", health: "건강", fun: "재미있는", like: "좋아하다", it: "그것", too: "너무",
   busy: "바쁜", hard: "어려운", me: "나에게", wow: "와!", sounds: "~처럼 들리다", that: "그것", "that's": "그것은 ~이다",
   cool: "멋진", great: "훌륭한", nice: "좋은",
+  breakfast: "아침밥", youtube: "유튜브", math: "수학", diary: "일기장 (write in my diary = 일기를 쓰다)", dog: "개, 강아지",
+  learn: "배우다", coding: "코딩", board: "판 (board games = 보드게임)", bake: "굽다", cookies: "쿠키들",
+  basketball: "농구", dodgeball: "피구", dance: "춤추다", "k-pop": "케이팝", sing: "노래하다", songs: "노래들",
+  roller: "롤러 (roller skating = 롤러스케이트 타기)", skating: "스케이트 타기", trampoline: "트램펄린", fly: "날리다, 날다", kite: "연",
+  karaoke: "노래방", an: "하나의 (모음 앞)", amusement: "놀이, 오락 (amusement park = 놀이공원)", park: "공원",
+  water: "물 (water park = 워터파크)", have: "가지다, (파티를) 하다", sleepover: "친구 집에서 자고 오기, 파자마 파티",
 };
