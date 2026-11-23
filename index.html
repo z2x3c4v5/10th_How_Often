@@ -19,12 +19,11 @@
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="book">📘 <span class="tab-long">교과서 대화</span><span class="tab-short">교과서</span></button>
-    <button class="tab-btn lv-basic" data-tab="basic">🌱 <span class="tab-long">초급</span><span class="tab-short">초급</span></button>
-    <button class="tab-btn lv-mid" data-tab="mid">🌿 <span class="tab-long">중급</span><span class="tab-short">중급</span></button>
-    <button class="tab-btn lv-adv" data-tab="adv">🌳 <span class="tab-long">고급</span><span class="tab-short">고급</span></button>
+    <button class="tab-btn active" data-tab="cards">🔁 <span class="tab-long">묻고 답하기</span><span class="tab-short">묻고 답하기</span></button>
+    <button class="tab-btn" data-tab="answer">💬 <span class="tab-long">빈도·반응 표현</span><span class="tab-short">빈도·반응</span></button>
+    <button class="tab-btn" data-tab="build">📅 <span class="tab-long">내 생활 습관 만들기</span><span class="tab-short">내 습관</span> <span id="set-count" class="tab-count">0/3</span></button>
+    <button class="tab-btn" data-tab="practice">🎤 <span class="tab-long">연습 · 짝 활동</span><span class="tab-short">연습·짝</span></button>
     <button class="tab-btn" data-tab="quiz">🎯 <span class="tab-long">빈도 퀴즈</span><span class="tab-short">퀴즈</span></button>
-    <button class="tab-btn" data-tab="practice">🎤 <span class="tab-long">연습하기</span><span class="tab-short">연습</span><span id="habit-count" class="tab-count">0</span></button>
   </nav>
 
   <div class="toolbar">
@@ -35,18 +34,45 @@
   </div>
 
   <main>
-    <!-- ===== 📘 교과서 대화 ===== -->
-    <section id="tab-book" class="tab-panel active">
+    <!-- ===== 🔁 묻고 답하기 (How often do you ~? / I ~ ___.) ===== -->
+    <section id="tab-cards" class="tab-panel active">
+      <details class="book-box">
+        <summary>📘 교과서 대화 · 핵심 낱말 다시 보기</summary>
+        <div class="section-block">
+          <h2>🔑 핵심 낱말 <span class="count">Key Words</span></h2>
+          <div id="key-words" class="key-words"></div>
+        </div>
+        <div class="section-block">
+          <h2>💬 교과서 대화 <span class="count">5개</span></h2>
+          <p class="hint">🔊 대화 듣기를 누르거나, 말풍선을 누르면 한 문장씩 들을 수 있어요.</p>
+          <div id="book-dialogs" class="book-dialogs"></div>
+        </div>
+      </details>
       <div class="section-block">
-        <h2>🔑 핵심 낱말 <span class="count">Key Words</span></h2>
-        <p class="hint">낱말을 누르면 발음을 들을 수 있어요.</p>
-        <div id="key-words" class="key-words"></div>
+        <h2>🔁 묻고 답하기 · How often do you ___? <span class="count" id="card-count"></span></h2>
+        <div class="level-switch" id="level-switch">
+          <button class="level-btn active" data-level="basic">🌱 초급</button>
+          <button class="level-btn" data-level="mid">🌿 중급</button>
+          <button class="level-btn" data-level="adv">🌳 고급</button>
+        </div>
+        <div class="cat-switch" id="card-cats"></div>
+        <p class="hint" id="card-hint"></p>
+        <div id="card-grid" class="card-grid five qa-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== 💬 빈도·반응 표현 ===== -->
+    <section id="tab-answer" class="tab-panel">
+      <p class="hint" style="margin-bottom:18px">💡 <b>How often do you ___?</b> 라고 물으면 <b>I ___ + 몇 번 + 언제마다.</b> 로 대답해요. 친구의 대답을 듣고 <b>Good for you!</b> 로 칭찬하거나 <b>You should ___ more often.</b> 으로 충고하고, 충고를 들으면 <b>I'll try.</b> 라고 말해요.</p>
+      <div class="section-block">
+        <h2>🔢 빈도 표현 만들기 <span class="count">몇 번 + 언제마다</span></h2>
+        <p class="hint">활동을 고르고 빈도를 골라 빈칸을 채워요. 달력 그림으로 얼마나 자주인지 볼 수 있어요.</p>
+        <div class="fill-box" id="freq-fill"></div>
       </div>
       <div class="section-block">
-        <h2>💬 교과서 대화 <span class="count">Dialogues</span></h2>
-        <p class="hint">🔊 를 누르면 대화 전체를 듣고, 말풍선을 누르면 한 문장씩 들어요. <b>🙋 A 역할 / 🙆 B 역할</b>을 고르면 내 차례에 말풍선이 가려져요 — 직접 말해 보세요!</p>
-        <div class="role-switch" id="role-switch"></div>
-        <div id="book-dialogs" class="book-dialogs"></div>
+        <h2>💬 친구의 반응 <span class="count" id="reaction-count"></span></h2>
+        <p class="hint">친구의 대답을 듣고 이렇게 말해요. 카드를 누르면 들을 수 있어요.</p>
+        <div id="reaction-grid" class="card-grid five"></div>
       </div>
       <div class="section-block">
         <h2>🧭 빈도 표현 한눈에 보기 <span class="count">초급 → 중급 → 고급</span></h2>
@@ -54,30 +80,68 @@
       </div>
     </section>
 
-    <!-- ===== 🌱 초급 · 🌿 중급 · 🌳 고급 ===== -->
-    <section id="tab-basic" class="tab-panel"><div id="board-basic"></div></section>
-    <section id="tab-mid" class="tab-panel"><div id="board-mid"></div></section>
-    <section id="tab-adv" class="tab-panel"><div id="board-adv"></div></section>
+    <!-- ===== 📅 내 생활 습관 만들기 (3개) ===== -->
+    <section id="tab-build" class="tab-panel">
+      <div class="section-block">
+        <h2>📅 내 생활 습관 만들기 <span class="count">3개</span></h2>
+        <p class="hint">친구에게 물어볼 <b>활동 3개</b>를 고르고, <b>나는 얼마나 자주 하는지</b> 빈도를 골라 대답을 만들어요. 다 만들면 아래 <b>📝 공책에 적기</b> 표를 보고 옮겨 적고, <b>🎤 연습 · 짝 활동</b>에서 친구와 묻고 답해요.</p>
+        <div class="set-tabs" id="set-tabs"></div>
+        <div class="fill-box dialog-box">
+          <div class="dlg-mode">
+            <span class="dlg-mode-label">수준</span>
+            <div class="mode-switch" id="set-level"></div>
+          </div>
+          <div class="set-preview">
+            <div class="set-pic" id="set-pic"></div>
+            <div class="br-dialogue" id="set-dialogue"></div>
+          </div>
+          <div id="set-vis" class="set-vis"></div>
+          <div class="dlg-status" id="set-status"></div>
+          <div class="fill-actions">
+            <button id="set-listen" class="btn primary" disabled>🔊 대화 듣기</button>
+            <button id="set-random" class="btn ghost">🎲 무작위로 채우기</button>
+            <button id="set-clear" class="btn ghost">🧹 이 습관 비우기</button>
+          </div>
+        </div>
+        <div class="build-step">
+          <h3 class="build-label">1️⃣ 활동 고르기 <span class="build-sub">How often do you ___?</span></h3>
+          <div id="build-acts"></div>
+        </div>
+        <div class="build-step">
+          <h3 class="build-label">2️⃣ 빈도 고르기 <span class="build-sub">I ___ (몇 번) (언제마다).</span></h3>
+          <div id="build-freq" class="ho-chips"></div>
+        </div>
+      </div>
+      <div class="section-block">
+        <h2>📝 공책에 적기 <span class="count">질문 · 대답</span></h2>
+        <p class="hint">만든 질문과 내 대답이에요. 영어 문장을 보고 그대로 옮겨 적어요. 🔊를 누르면 읽어 줘요.</p>
+        <div id="sheet-summary" class="sheet-table"></div>
+      </div>
+    </section>
 
-    <!-- ===== 🎯 빈도 퀴즈 ===== -->
-    <section id="tab-quiz" class="tab-panel"><div id="quiz"></div></section>
-
-    <!-- ===== 🎤 연습하기 : 나의 생활 습관표 ===== -->
+    <!-- ===== 🎤 연습 · 짝 활동 ===== -->
     <section id="tab-practice" class="tab-panel">
       <div class="section-block">
-        <h2>📝 나의 생활 습관표 <span class="count">My Habits</span></h2>
-        <p class="hint"><b>🌱 초급 · 🌿 중급 · 🌳 고급</b>에서 <b>➕ 습관표에 담기</b>를 누른 대화가 여기에 모여요. 🔊 로 듣고, <b>🎙️ 말하기</b>로 내 대답을 말하면 <b>정확도(%)</b>를 알려 주고 녹음돼요. <b>▶ 내 목소리</b>로 다시 들어 보세요. (Chrome 권장)</p>
+        <h2>👫 짝 활동 카드 <span class="count">친구 인터뷰</span></h2>
+        <p class="hint">짝에게 <b>How often do you ___?</b> 로 물어보고, 친구의 대답(몇 번 · 언제마다)을 적어요. 친구가 자주 하면 <b>Good for you!</b>, 조금 하면 <b>You should ___ more often.</b> 이라고 말해 줘요. 내가 대답할 때는 아래 <b>내 대답</b>을 말해요.</p>
+        <div id="pair-cards" class="pair-cards"></div>
+      </div>
+      <div class="section-block">
+        <h2>🎤 컴퓨터와 미리 연습하기</h2>
+        <p class="hint">짝 활동 전에 혼자 연습해요. 줄마다 <b>🎙️ 말하기</b>로 정확도를 재요. <b>🎭 역할극</b>에서 <b>묻는 사람</b> 또는 <b>대답하는 사람</b>을 맡으면 컴퓨터가 상대 역할을 읽어 주고, 내 차례에는 🎙️를 눌러 말해요. (Chrome 권장)</p>
         <div class="plan-name">
           <div id="practice-summary" class="practice-summary"></div>
           <div class="plan-name-btns">
             <button id="stats-reset" class="btn small ghost" disabled>🧹 기록 지우기</button>
-            <button id="habit-listen-all" class="btn small" disabled>🔊 전체 듣기</button>
-            <button id="print-habits" class="btn small primary">🖨️ 인쇄하기</button>
           </div>
         </div>
-        <div id="habit-board" class="plan-board"></div>
+        <p id="practice-empty" class="practice-empty">아직 만든 습관이 없어요! <b>📅 내 생활 습관 만들기</b> 탭에서 활동과 빈도를 골라 보세요.</p>
+        <div id="practice-list" class="practice-list"></div>
       </div>
     </section>
+
+    <!-- ===== 🎯 빈도 퀴즈 ===== -->
+    <section id="tab-quiz" class="tab-panel"><div id="quiz"></div></section>
   </main>
 
   <div id="toast" class="toast hidden"></div>

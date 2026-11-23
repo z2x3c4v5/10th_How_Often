@@ -133,10 +133,35 @@ const EXTRAS = [
 /* 이유 한 문장 (고급) */
 const REASONS = [
   { key: "health", en: "It's good for my health.", ko: "건강에 좋거든." },
+  { key: "good",   en: "It's good for me.",        ko: "나한테 도움이 되거든." },
   { key: "fun",    en: "It's fun.",                ko: "재미있거든." },
   { key: "like",   en: "I like it.",               ko: "나는 그게 좋아." },
   { key: "busy",   en: "I'm too busy.",            ko: "너무 바빠서." },
   { key: "hard",   en: "It's hard for me.",        ko: "나한테는 어려워." },
+];
+
+/* ===== 고급 예시 문장에 붙일 말 (언제·누구와) ===== */
+const ADV_EXTRA = {
+  brush: "after-meals", exercise: "after-school", library: "weekends", milk: "morning", fruit: "after-school",
+  shower: "before-bed", fastfood: "family", clean: "weekends", read: "before-bed", homework: "after-school",
+  dishes: "family", english: "after-school", cook: "family", walk: "morning", music: "before-bed", tv: "after-school",
+  games: "weekends", phone: "after-school", soccer: "friends", bike: "friends", swim: "weekends", rope: "after-school",
+  taekwondo: "after-school", badminton: "family", piano: "after-school", draw: "weekends", grandparents: "family",
+  movies: "friends", shopping: "family", camping: "family", hiking: "family", fishing: "family",
+  breakfast: "morning", youtube: "before-bed", math: "after-school", diary: "before-bed", dog: "morning",
+  coding: "after-school", photos: "friends", boardgame: "family", cookies: "family", basketball: "friends",
+  dodgeball: "friends", dance: "friends", sing: "friends", roller: "friends", trampoline: "friends", kite: "family",
+  karaoke: "friends", amusement: "family", waterpark: "family", sleepover: "friends",
+};
+
+/* ===== 친구의 반응 표현 ===== */
+const REACTIONS = [
+  { en: "Good for you!",                       ko: "잘하고 있구나!",              emoji: "👍", when: "자주 하는 좋은 습관을 들었을 때" },
+  { en: "You should exercise more often.",     ko: "너는 더 자주 운동해야 해.",    emoji: "💪", when: "좋은 습관을 조금 할 때 (more often)" },
+  { en: "You should watch TV less often.",     ko: "너는 TV를 덜 봐야 해.",        emoji: "⏬", when: "너무 많이 할 때 (less often)" },
+  { en: "I'll try.",                           ko: "노력해 볼게.",                emoji: "🙂", when: "충고를 들었을 때" },
+  { en: "Sounds fun!",                         ko: "재미있겠다!",                 emoji: "😆", when: "재미있는 활동을 들었을 때" },
+  { en: "Wow, me too!",                        ko: "와, 나도 그래!",              emoji: "🙌", when: "나도 비슷하게 할 때" },
 ];
 
 /* ===== 수준별 설정 ===== */

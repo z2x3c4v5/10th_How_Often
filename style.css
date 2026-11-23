@@ -985,3 +985,37 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
   .app-header .floaty { font-size: 1.8rem; opacity: 0.35; }
   .floaty1 { top: 6px; left: 8px; } .floaty2 { top: 6px; right: 8px; }
 }
+
+/* ===== 참고 앱(6th Can you come to ~?) 구성으로 바꾼 부분 ===== */
+.tabs .tab-btn { max-width: 200px; }
+.book-box { background: rgba(255,255,255,0.75); border: 2px solid #bae6fd; border-radius: 20px; padding: 10px 16px; margin-bottom: 22px; }
+.book-box summary { cursor: pointer; font-weight: 800; color: var(--primary-dark); font-size: 1.05rem; padding: 4px 0; }
+.book-box[open] summary { margin-bottom: 8px; }
+.qa-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.qa-grid .card .en { font-size: 1.08rem; }
+.qa-grid .card .ko { font-size: 0.86rem; margin-top: 3px; }
+.sentence-box.qa-a { margin-top: 8px; background: #f0fdf4; }
+.qa-label { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; margin-right: 6px; font-size: 0.8rem; color: #fff; background: var(--primary); vertical-align: 2px; }
+.qa-a .qa-label { background: #16a34a; }
+.card-note:empty { display: none; }
+@media (max-width: 900px) { .qa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .qa-grid { grid-template-columns: minmax(0, 1fr); } }
+.set-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.set-preview { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-items: center; }
+.set-pic .visual { height: 150px; margin: 0; border-radius: 16px; }
+.set-pic-empty { height: 150px; display: grid; place-items: center; font-size: 3rem; background: #f0f9ff; border: 2px dashed #bae6fd; border-radius: 16px; }
+.set-vis { margin-top: 12px; }
+@media (max-width: 640px) { .set-preview { grid-template-columns: 1fr; } .set-pic .visual, .set-pic-empty { height: 120px; max-width: 220px; margin: 0 auto; } }
+#build-freq { margin-top: 6px; }
+.ff-chips { margin-top: 12px; }
+.ff-vis { margin-top: 12px; }
+.pair-write { font-size: 1.05rem; font-weight: 700; margin: 6px 0; }
+.write-line { display: inline-block; min-width: 110px; border-bottom: 2px solid var(--muted); margin: 0 4px; }
+.write-line.wide { min-width: 190px; }
+.pair-line.mine { background: #f0fdf4; border-radius: 12px; padding: 6px 8px; }
+.pair-en.small { font-size: 1.05rem; }
+.prow .plan-mic { margin: 6px 0 0 44px; }
+.prow.turn { box-shadow: 0 0 0 3px var(--ring); border-radius: 14px; }
+@media (max-width: 560px) { .prow .plan-mic { margin-left: 0; } }
+.card .en, .br-sentence, .pair-en, .prow .en { text-align: left; }
+.qa-grid .card .visual { height: 130px; }
