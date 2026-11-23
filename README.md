@@ -48,6 +48,15 @@ eat breakfast · watch YouTube · study math · write in my diary · walk my dog
 
 ## 사용 방법
 
+### GitHub Pages로 올리기
+1. 저장소 **Settings → Pages** 로 가요.
+2. **Source: Deploy from a branch** 를 고르고, 브랜치는 이 앱이 있는 브랜치(예: `main`), 폴더는 **/ (root)** 로 정한 뒤 **Save**.
+3. 1~2분 뒤 `https://z2x3c4v5.github.io/10th_How_Often/` 에서 열려요. (HTTPS라서 크롬에서 🎙️ 말하기도 돼요)
+
+`.nojekyll` 파일이 있어 GitHub가 파일을 그대로 올려요. 모든 경로가 상대 경로라 저장소 이름이 바뀌어도 그대로 동작해요.
+
+### 컴퓨터에서 바로 열기
+
 `index.html`을 브라우저(크롬 권장)에서 열면 됩니다. 별도 설치가 필요 없습니다.
 음성은 브라우저 내장 **Web Speech API**(음성 합성·음성 인식)와 **MediaRecorder**(녹음)를 사용합니다. 습관표와 연습 기록은 브라우저(localStorage)에 저장됩니다.
 
