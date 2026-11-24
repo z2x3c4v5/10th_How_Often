@@ -1,7 +1,7 @@
 # How often do you ___? · 얼마나 자주 하니?
 
 6학년 영어 **10단원 How often do you ___?** 학습용 웹앱입니다.
-교과서 대화를 그대로 담고, 빈도 표현을 **🌱 초급 · 🌿 중급 · 🌳 고급**으로 나눠 묻고 답하며 익힐 수 있도록 만들었습니다.
+교과서 대화를 그대로 담고, 빈도 표현을 **🌱 초급 · 🌿 중급**으로 나눠 묻고 답하며 익힐 수 있도록 만들었습니다.
 (6학년 *What are you going to do?*, 5학년 *My Favorite* 와 같은 구성, ❄️ 겨울 테마)
 
 ## 주요 표현
@@ -12,20 +12,21 @@
 | 대답 | **I** brush my teeth **twice a day.** |
 | 반응 | **Good for you!** / **You should** brush your teeth **more often.** — **I'll try.** |
 
-## 수준별 빈도 표현
+## 🌱 초급 · 🌿 중급 (맨 위 탭)
 
-| 수준 | 빈도 표현 | 예시 |
+| 수준 | 대답에 쓰는 표현 | 예시 |
 |------|-----------|------|
-| 🌱 초급 | once ~ six times × a day · a week | I brush my teeth **twice a day**. |
-| 🌿 중급 | once ~ six times × a day · a week · a month · a year, every day · every weekend, **more often / less often**, I'll try. | I go to the dentist **twice a year**. / You should play computer games **less often**. |
-| 🌳 고급 | 빈도부사 **always(100%) · usually(80%) · often(60%) · sometimes(30%) · never(0%)** + 횟수 + 언제·누구와 + 이유 한 문장 | I **usually** ride my bike twice a week **with my friends**. **It's fun.** |
+| 🌱 초급 | 🔢 몇 번?(once ~ six times) + 📅 언제마다?(a day · a week · a month · a year) — 따로따로 골라요 | I brush my teeth **twice a day**. |
+| 🌿 중급 | 초급 + 📊 빈도부사(**always · usually · often · sometimes · never**) + ➕ 언제·누구와(after meals · after school · in the morning · before bed · on weekends · with my family · with my friends) | I **usually** ride my bike twice a week **with my friends**. |
+
+초급과 중급은 고른 질문과 대답을 **따로 저장**해요. 탭을 바꾸면 그 수준에서 만든 것이 그대로 보여요.
 
 ## 기능 — 질문 고르기 → 대답 만들기 → 연습하기
 
 1. ❓ **질문 고르기** — 활동 종류(📘 교과서 · 🧒 우리 생활 20 · 🍎 건강 · 🏠 집·공부 · ⚽ 운동·취미 · 👨‍👩‍👧 나들이)별 질문 카드 57개
    - 카드의 **✅ 이 질문 고르기**로 친구에게 물어볼 질문을 **최대 5개** 고름 · 아래 **고른 질문** 막대에서 확인하고 ✕로 빼기
    - 📘 교과서 대화 5개 · 핵심 낱말 7개 다시 보기
-2. ✍️ **대답 만들기** — 고른 질문마다 **🔢 몇 번?**(once ~ six times)과 **📅 언제마다?**(a day · a week …)를 따로 골라 **I ___ (몇 번) (언제마다).** 대답 완성 · 수준(🌱 초급 · 🌿 중급 · 🌳 고급)에 따라 쓸 수 있는 표현이 늘어남
+2. ✍️ **대답 만들기** — 고른 질문마다 **🔢 몇 번?**(once ~ six times)과 **📅 언제마다?**(a day · a week · a month · a year)를 따로 골라 **I ___ (몇 번) (언제마다).** 대답 완성 · 🌿 중급에서는 빈도부사와 언제·누구와도 골라요
    - 말풍선 대화(질문 → 내 대답 → 친구 반응 → I'll try.)와 📅 빈도 그림이 바로 바뀜 · 🎲 예시로 채우기 · 다음 질문 ▶
    - 💡 빈도 표현 · 반응 표현 도움말 · 📝 **공책에 적기** 표(질문 · 내 대답)
 3. 🎤 **연습하기** — 만든 대화마다 **🔊 대화 듣기** · **🎙️ 연습하기** 버튼

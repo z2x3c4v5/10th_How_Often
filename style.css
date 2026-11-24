@@ -1017,3 +1017,22 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
   .picked-bar .pb-list { display: none; }
   .picked-bar { padding: 8px 10px; gap: 6px; }
 }
+
+/* ===== 🌱 초급 · 🌿 중급 탭 ===== */
+.mode-bar { display: flex; gap: 10px; justify-content: center; max-width: 980px; margin: 16px auto 0; padding: 0 14px; }
+.mode-btn {
+  flex: 1; max-width: 330px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 12px 10px; border-radius: 18px; border: 3px solid transparent; cursor: pointer;
+  background: rgba(255,255,255,0.85); color: var(--primary-dark); font-size: 1.2rem; font-weight: 800;
+  box-shadow: var(--shadow-sm); font-family: var(--font);
+}
+.mode-btn small { font-size: 0.78rem; font-weight: 700; opacity: 0.85; }
+.mode-btn.lv-basic.active { background: linear-gradient(135deg, #4ade80, #16a34a); color: #fff; }
+.mode-btn.lv-mid.active { background: linear-gradient(135deg, #2dd4bf, #0f766e); color: #fff; }
+.mode-btn:active { transform: scale(0.97); }
+.mode-guide { border-radius: 14px; padding: 10px 14px; background: #f0fdf4; border: 2px solid #86efac; line-height: 1.6; font-size: 0.95rem; }
+body.mode-mid .mode-guide { background: #f0fdfa; border-color: #5eead4; }
+.ladder.lv-mid { border-color: #0f766e; }
+.freq-ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) { .freq-ladder { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .mode-btn { font-size: 1.05rem; padding: 10px 6px; } .mode-btn small { font-size: 0.68rem; } }

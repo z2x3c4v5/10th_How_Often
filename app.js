@@ -321,25 +321,15 @@ function freqVisual(sel, emoji, hideText) {
  * =========================================================== */
 function exampleSel(a, level) {
   const [n, per] = a.rec;
-  if (level === "basic") {
-    if ((per === "day" || per === "week") && n <= 6) return { n, per };
-    if (per === "day") return { n: 3, per: "day" };
-    if (per === "week") return { n: 3, per: "week" };
-    return { n: 1, per: "week" };
-  }
   const sel = { n, per };
-  if (level === "mid") return sel;
+  if (!LEVELS[level].adv) return sel;
   const pw = n * PERIODS[per].perWeek;
   sel.adv = pw >= 7 ? "always" : pw >= 3 ? "usually" : pw >= 1 ? "often" : "sometimes";
   if (ADV_EXTRA[a.id]) sel.extra = ADV_EXTRA[a.id];
-  const rule = a.rule || {};
-  sel.reason = rule.good != null ? (a.cat === "health" || ["exercise", "rope", "swim"].includes(a.id) ? "health" : "good")
-    : rule.less != null ? "fun" : (ACTIVITIES.indexOf(a) % 2 ? "like" : "fun");
   return sel;
 }
-const LEVEL_LABEL = { basic: "🌱 초급", mid: "🌿 중급", adv: "🌳 고급" };
+const LEVEL_LABEL = { basic: "🌱 초급", mid: "🌿 중급" };
 const actTag = a => (a.book ? "📘 " : a.life ? "🧒 " : "") + catLabel(a.cat);
-const levelActs = level => ACTIVITIES.filter(a => level === "adv" || a.lv <= (level === "basic" ? 1 : 2));
 
 /* ---------- 빈도 칩 (수준별) ---------- */
 function chipRow(label, items, isOn, onClick, extraCls) {
@@ -367,7 +357,7 @@ function renderFreqChips(box, level, sel, onChange) {
   const L = LEVELS[level];
   box.innerHTML = "";
   const never = isNever(sel);
-  if (level === "adv") {
+  if (L.adv) {
     box.appendChild(chipRow("📊 얼마나?<small>빈도부사</small>",
       ADVERBS.map(x => ({ key: x.key, en: x.en, ko: `${x.ko} ${x.pct}%` })),
       it => sel.adv === it.key,
@@ -388,15 +378,11 @@ function renderFreqChips(box, level, sel, onChange) {
       it => sel.every === it.k,
       it => { sel.every = sel.every === it.k ? null : it.k; if (sel.every) { sel.n = null; sel.per = null; } onChange(); }));
   }
-  if (level === "adv") {
-    box.appendChild(chipRow("➕ 언제·누구와?",
+  if (L.adv) {
+    box.appendChild(chipRow("➕ 언제·누구와?<small>덧붙이기</small>",
       EXTRAS.map(x => ({ key: x.key, en: x.en, ko: x.ko })),
       it => sel.extra === it.key,
       it => { sel.extra = sel.extra === it.key ? null : it.key; onChange(); }, "row-extra"));
-    box.appendChild(chipRow("💬 왜?<small>한 문장 더</small>",
-      REASONS.map(x => ({ key: x.key, en: x.en, ko: x.ko })),
-      it => sel.reason === it.key,
-      it => { sel.reason = sel.reason === it.key ? null : it.key; onChange(); }, "row-reason"));
   }
 }
 /* 수준을 낮추면 그 수준에 없는 빈도는 지워요 */
@@ -405,7 +391,8 @@ function fitSel(sel, level) {
   if (sel.n && !L.nums.includes(sel.n)) sel.n = null;
   if (sel.per && !L.periods.includes(sel.per)) sel.per = null;
   if (sel.every && !L.every.includes(sel.every)) sel.every = null;
-  if (level !== "adv") { sel.adv = sel.extra = sel.reason = null; }
+  if (!L.adv) { sel.adv = sel.extra = null; }
+  sel.reason = null;
   return sel;
 }
 
@@ -414,10 +401,12 @@ const BLANK = '<span class="blank">______</span>';
 const filled = t => `<span class="blank filled">${t}</span>`;
 function partialHtml(a, sel) {
   const ad = advOf(sel);
-  return `I ${ad ? ad.en + " " : ""}${a.a} ${sel.n ? filled(NUM_EN[sel.n]) : BLANK} ${sel.per ? filled(PERIODS[sel.per].en) : BLANK}.`;
+  const ex = sel.extra && EXTRAS.find(x => x.key === sel.extra);
+  return `I ${ad ? filled(ad.en) + " " : ""}${a.a} ${sel.n ? filled(NUM_EN[sel.n]) : BLANK} ${sel.per ? filled(PERIODS[sel.per].en) : BLANK}${ex ? " " + filled(ex.en) : ""}.`;
 }
 function partialKo(a, sel) {
-  return `나는 ${sel.per ? PERIODS[sel.per].ko : "______"} ${sel.n ? NUM_KO[sel.n] + " 번" : "______"} ${a.koA}.`;
+  const ad = advOf(sel), ex = sel.extra && EXTRAS.find(x => x.key === sel.extra);
+  return `나는 ${ad ? ad.ko + " " : ""}${ex ? ex.ko + " " : ""}${sel.per ? PERIODS[sel.per].ko : "______"} ${sel.n ? NUM_KO[sel.n] + " 번" : "______"} ${a.koA}.`;
 }
 
 /* ---------- 말풍선 대화 ---------- */
@@ -532,11 +521,22 @@ function makeCard(item, opts) {
  *  myQs = [{ id, level, sel }]  — 1. 질문 고르기에서 담고, 2. 대답 만들기에서 sel 을 채워요
  * =========================================================== */
 const MAX_Q = 5;
-let myQs = [];
-try { myQs = JSON.parse(localStorage.getItem("howoften_qa") || "[]") || []; } catch (e) {}
-myQs = (Array.isArray(myQs) ? myQs : []).filter(q => q && findAct(q.id)).slice(0, MAX_Q)
-  .map(q => ({ id: q.id, level: LEVELS[q.level] ? q.level : "basic", sel: q.sel || {} }));
-function persist() { try { localStorage.setItem("howoften_qa", JSON.stringify(myQs)); } catch (e) {} }
+let mode = "basic";       // 🌱 초급 · 🌿 중급 (맨 위 탭)
+let qaStore = { basic: [], mid: [] };
+try {
+  const saved = JSON.parse(localStorage.getItem("howoften_qa2") || "null");
+  if (saved) qaStore = saved;
+  else qaStore.basic = JSON.parse(localStorage.getItem("howoften_qa") || "[]") || [];   // 예전 저장은 초급으로
+  mode = localStorage.getItem("howoften_mode") === "mid" ? "mid" : "basic";
+} catch (e) {}
+["basic", "mid"].forEach(k => {
+  qaStore[k] = (Array.isArray(qaStore[k]) ? qaStore[k] : []).filter(q => q && findAct(q.id)).slice(0, MAX_Q)
+    .map(q => ({ id: q.id, sel: fitSel(q.sel || {}, k) }));
+});
+let myQs = qaStore[mode];
+function persist() {
+  try { localStorage.setItem("howoften_qa2", JSON.stringify(qaStore)); localStorage.setItem("howoften_mode", mode); } catch (e) {}
+}
 const qAct = q => findAct(q.id);
 const qDone = q => isComplete(q.sel);
 const doneCount = () => myQs.filter(qDone).length;
@@ -560,7 +560,7 @@ function toggleQuestion(a) {
     toast(`${a.emoji} 질문을 뺐어요.`);
   } else {
     if (myQs.length >= MAX_Q) { toast(`질문은 ${MAX_Q}개까지 고를 수 있어요. 다른 질문을 빼고 골라 주세요.`); return; }
-    myQs.push({ id: a.id, level: "basic", sel: {} });
+    myQs.push({ id: a.id, sel: {} });
     toast(`✅ ${questionEn(a)} → 고른 질문에 담았어요! (${myQs.length}/${MAX_Q})`);
     speak(questionEn(a));
   }
@@ -702,17 +702,16 @@ function renderLadder() {
   const lad = document.getElementById("freq-ladder");
   lad.innerHTML = `
     <div class="ladder lv-basic"><h3>🌱 초급</h3>
-      <p>🔢 <b>once</b> 한 번 · <b>twice</b> 두 번 · <b>three times</b> 세 번 · <b>four / five / six times</b></p>
-      <p>📅 + <b>a day</b> 하루에 · <b>a week</b> 일주일에</p>
-      <p class="ex">I brush my teeth twice a day.</p></div>
-    <div class="ladder lv-mid"><h3>🌿 중급</h3>
-      <p>📅 + <b>a month</b> 한 달에 · <b>a year</b> 일 년에</p>
-      <p><b>every day</b> 매일 · <b>every weekend</b> 주말마다</p>
+      <p>🔢 몇 번? <b>once</b> 한 번 · <b>twice</b> 두 번 · <b>three times</b> 세 번 · <b>four / five / six times</b></p>
+      <p>📅 언제마다? <b>a day</b> 하루에 · <b>a week</b> 일주일에 · <b>a month</b> 한 달에 · <b>a year</b> 일 년에</p>
+      <p class="ex">I brush my teeth twice a day.</p>
       <p class="ex">I go to the dentist twice a year.</p></div>
-    <div class="ladder lv-adv"><h3>🌳 고급</h3>
-      <p><b>always</b> 100% · <b>usually</b> 80% · <b>often</b> 60% · <b>sometimes</b> 30% · <b>never</b> 0%</p>
-      <p>+ 언제·누구와 (after school, with my family) + 이유</p>
-      <p class="ex">I usually ride my bike twice a week with my friends. It's fun.</p></div>`;
+    <div class="ladder lv-mid"><h3>🌿 중급</h3>
+      <p>📊 빈도부사는 동사 앞에: <b>always</b> 100% · <b>usually</b> 80% · <b>often</b> 60% · <b>sometimes</b> 30% · <b>never</b> 0%</p>
+      <p>➕ 언제·누구와: <b>after meals</b> · <b>after school</b> · <b>in the morning</b> · <b>before bed</b> · <b>on weekends</b> · <b>with my family</b> · <b>with my friends</b></p>
+      <p class="ex">I usually brush my teeth three times a day after meals.</p>
+      <p class="ex">I often ride my bike twice a week with my friends.</p>
+      <p class="ex">I never eat fast food.</p></div>`;
   lad.querySelectorAll(".ex").forEach(p => p.addEventListener("click", () => speak(p.textContent)));
 }
 
@@ -771,16 +770,7 @@ function renderBuilder() {
   empty.hidden = true; main.hidden = false;
   curQ = Math.min(curQ, myQs.length - 1);
   const q = myQs[curQ];
-  const lv = document.getElementById("set-level");
-  lv.innerHTML = "";
-  Object.keys(LEVELS).forEach(k => {
-    const b = document.createElement("button");
-    b.className = "cat-btn lvbtn lv-" + k + (q.level === k ? " active" : "");
-    b.textContent = LEVEL_LABEL[k];
-    b.addEventListener("click", () => { q.level = k; fitSel(q.sel, k); persist(); renderBuilder(); });
-    lv.appendChild(b);
-  });
-  renderFreqChips(document.getElementById("build-freq"), q.level, q.sel, () => {
+  renderFreqChips(document.getElementById("build-freq"), mode, q.sel, () => {
     persist(); renderBuilder();
     if (qDone(q)) speak(answerEn(qAct(q), q.sel));
   });
@@ -790,7 +780,7 @@ function renderBuilder() {
 document.getElementById("set-listen").addEventListener("click", () => { if (setView && setView.done) playLines(setView.rows, setView.lines); });
 document.getElementById("set-random").addEventListener("click", () => {
   const q = myQs[curQ]; if (!q) return;
-  q.sel = exampleSel(qAct(q), q.level);
+  q.sel = exampleSel(qAct(q), mode);
   persist(); renderBuilder();
   speak(dialogLines(qAct(q), q.sel).map(l => l.en).join(" "));
 });
@@ -1303,7 +1293,30 @@ function renderPractice() {
   renderPracticeSummary();
 }
 
+/* ===========================================================
+ * 🌱 초급 · 🌿 중급 (맨 위 탭) : 수준마다 고른 질문과 대답을 따로 저장해요
+ * =========================================================== */
+const MODE_GUIDE = {
+  basic: "🌱 <b>초급</b>: <b>🔢 몇 번?</b>(once ~ six times)과 <b>📅 언제마다?</b>(a day · a week · a month · a year)를 골라 대답해요. 예) I brush my teeth <b>twice a day</b>.",
+  mid: "🌿 <b>중급</b>: 초급 대답에 <b>📊 빈도부사</b>(always · usually · often · sometimes · never)를 동사 앞에 넣고, <b>➕ 언제·누구와</b>를 덧붙여요. 예) I <b>usually</b> brush my teeth twice a day <b>after meals</b>.",
+};
+function renderModeBar() {
+  document.body.classList.toggle("mode-mid", mode === "mid");
+  document.querySelectorAll(".mode-bar .mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+  document.querySelectorAll(".mode-guide").forEach(el => { el.innerHTML = MODE_GUIDE[mode]; });
+}
+function setMode(m) {
+  if (m === mode) return;
+  mode = m; myQs = qaStore[mode]; curQ = 0;
+  persist(); synth.cancel(); hidePopup();
+  renderModeBar(); refreshAskCards(); renderPicked(); renderBuilder(); updateBadges();
+  if (document.getElementById("tab-practice").classList.contains("active")) renderPractice();
+  toast(`${LEVEL_LABEL[mode]} 으로 바꿨어요. 고른 질문과 대답은 수준마다 따로 저장돼요.`);
+}
+document.querySelectorAll(".mode-bar .mode-btn").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
 /* ---------- 초기 렌더 ---------- */
+renderModeBar();
 renderBook();
 renderAskCards();
 renderPicked();
