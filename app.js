@@ -4,7 +4,7 @@
  * - 단어 클릭: 단어 발음 + 뜻 풍선(popup)
  * - 그림: Canva로 만든 활동 그림 images/활동id.png (없으면 이모지)
  * - ❓ 1. 질문 고르기(최대 5개, 📘 교과서 대화 포함) → ✍️ 2. 대답 만들기(수준·빈도, 📝 공책에 적기)
- *   → 🎤 3. 연습하기(🎙️ 연습하기 · 🎭 역할극 · 👫 짝 활동 카드) · 🎯 빈도 퀴즈
+ *   → 🎤 3. 연습하기(🎙️ 연습하기 · 🎭 역할극 · 👫 짝 활동 카드)
  * ========================================================= */
 
 /* ---------- 음성 합성 (TTS) ---------- */
@@ -322,7 +322,7 @@ function freqVisual(sel, emoji, hideText) {
 function exampleSel(a, level) {
   const [n, per] = a.rec;
   if (level === "basic") {
-    if ((per === "day" || per === "week") && n <= 3) return { n, per };
+    if ((per === "day" || per === "week") && n <= 6) return { n, per };
     if (per === "day") return { n: 3, per: "day" };
     if (per === "week") return { n: 3, per: "week" };
     return { n: 1, per: "week" };
@@ -377,11 +377,11 @@ function renderFreqChips(box, level, sel, onChange) {
   box.appendChild(chipRow("🔢 몇 번?",
     L.nums.map(n => ({ n, en: NUM_EN[n], ko: `${NUM_KO[n]} 번`, disabled: never })),
     it => sel.n === it.n,
-    it => { sel.every = null; sel.n = sel.n === it.n ? null : it.n; if (!sel.per && sel.n) sel.per = L.periods[0]; onChange(); }));
+    it => { sel.every = null; sel.n = sel.n === it.n ? null : it.n; onChange(); }));
   box.appendChild(chipRow("📅 언제마다?",
     L.periods.map(p => ({ p, en: PERIODS[p].en, ko: PERIODS[p].ko, disabled: never })),
     it => !sel.every && sel.per === it.p,
-    it => { sel.every = null; sel.per = it.p; if (!sel.n) sel.n = 1; onChange(); }));
+    it => { sel.every = null; sel.per = sel.per === it.p ? null : it.p; onChange(); }));
   if (L.every.length) {
     box.appendChild(chipRow("🔁 또는",
       L.every.map(k => ({ k, en: EVERY[k].en, ko: EVERY[k].ko, disabled: never })),
@@ -404,10 +404,20 @@ function fitSel(sel, level) {
   const L = LEVELS[level];
   if (sel.n && !L.nums.includes(sel.n)) sel.n = null;
   if (sel.per && !L.periods.includes(sel.per)) sel.per = null;
-  if (!sel.n || !sel.per) { sel.n = sel.n && sel.per ? sel.n : null; if (!sel.n) sel.per = null; }
   if (sel.every && !L.every.includes(sel.every)) sel.every = null;
   if (level !== "adv") { sel.adv = sel.extra = sel.reason = null; }
   return sel;
+}
+
+/* ---------- 몇 번 · 언제마다 중 하나만 골랐을 때 ---------- */
+const BLANK = '<span class="blank">______</span>';
+const filled = t => `<span class="blank filled">${t}</span>`;
+function partialHtml(a, sel) {
+  const ad = advOf(sel);
+  return `I ${ad ? ad.en + " " : ""}${a.a} ${sel.n ? filled(NUM_EN[sel.n]) : BLANK} ${sel.per ? filled(PERIODS[sel.per].en) : BLANK}.`;
+}
+function partialKo(a, sel) {
+  return `나는 ${sel.per ? PERIODS[sel.per].ko : "______"} ${sel.n ? NUM_KO[sel.n] + " 번" : "______"} ${a.koA}.`;
 }
 
 /* ---------- 말풍선 대화 ---------- */
@@ -420,7 +430,7 @@ function renderDialogue(box, a, sel, opts) {
     { who: "B", en: null, html: 'I ________ <span class="blank">________</span>.', ko: "나는 ________ ________." },
   ] : done ? dialogLines(a, sel) : [
     { who: "A", en: questionEn(a), ko: questionKo(a) },
-    { who: "B", en: null, html: `I ${a.a} <span class="blank">________</span>.`, ko: `나는 ________ ${a.koA}.` },
+    { who: "B", en: null, html: partialHtml(a, sel), ko: partialKo(a, sel) },
   ];
   const rows = lines.map(ln => {
     const row = document.createElement("div");
@@ -692,11 +702,11 @@ function renderLadder() {
   const lad = document.getElementById("freq-ladder");
   lad.innerHTML = `
     <div class="ladder lv-basic"><h3>🌱 초급</h3>
-      <p><b>once</b> 한 번 · <b>twice</b> 두 번 · <b>three times</b> 세 번</p>
-      <p>+ <b>a day</b> 하루에 · <b>a week</b> 일주일에</p>
+      <p>🔢 <b>once</b> 한 번 · <b>twice</b> 두 번 · <b>three times</b> 세 번 · <b>four / five / six times</b></p>
+      <p>📅 + <b>a day</b> 하루에 · <b>a week</b> 일주일에</p>
       <p class="ex">I brush my teeth twice a day.</p></div>
     <div class="ladder lv-mid"><h3>🌿 중급</h3>
-      <p><b>four ~ ten times</b> · <b>a month</b> 한 달에 · <b>a year</b> 일 년에</p>
+      <p>📅 + <b>a month</b> 한 달에 · <b>a year</b> 일 년에</p>
       <p><b>every day</b> 매일 · <b>every weekend</b> 주말마다</p>
       <p class="ex">I go to the dentist twice a year.</p></div>
     <div class="ladder lv-adv"><h3>🌳 고급</h3>
@@ -734,7 +744,12 @@ function renderSetPreview() {
   vis.appendChild(freqVisual(q.sel, a.emoji));
   const st = document.getElementById("set-status");
   const n = doneCount(), total = myQs.length;
-  if (!qDone(q)) { st.className = "dlg-status"; st.textContent = "👆 빈도를 골라 내 대답을 완성해요"; }
+  if (!qDone(q)) {
+    st.className = "dlg-status";
+    st.textContent = q.sel.n && !q.sel.per ? "👆 이제 📅 언제마다?(a day · a week …)를 골라요"
+      : q.sel.per && !q.sel.n ? "👆 이제 🔢 몇 번?(once ~ six times)을 골라요"
+      : "👆 🔢 몇 번?과 📅 언제마다?를 골라 내 대답을 완성해요";
+  }
   else {
     const re = reaction(a, q.sel);
     st.className = "dlg-status ok " + re.mood;
@@ -863,146 +878,6 @@ function renderPairCards() {
   });
 }
 
-/* ===========================================================
- * 🎯 빈도 퀴즈
- *  👀 그림 보고 고르기 : 빈도 그림을 보고 알맞은 문장 고르기
- *  👂 듣고 고르기     : 문장을 듣고 알맞은 빈도 그림 고르기
- * =========================================================== */
-const quiz = { mode: "see", level: "basic", qs: [], i: 0, score: 0, answered: false };
-const QUIZ_LEN = 10;
-
-function quizSel(level) {
-  if (level === "adv") return { adv: rand(ADVERBS).key };
-  if (level === "mid" && Math.random() < 0.2) return { every: rand(["everyday", "everyweekend"]) };
-  const per = rand(LEVELS[level].periods);
-  const max = level === "basic" ? 3 : { day: 5, week: 7, month: 6, year: 4 }[per];
-  return { n: 1 + Math.floor(Math.random() * max), per };
-}
-const selKey = s => s.adv || s.every || `${s.n}-${s.per}`;
-function makeQuiz() {
-  const pool = ACTIVITIES.filter(a => quiz.level === "adv" || a.lv <= (quiz.level === "basic" ? 1 : 2));
-  return shuffle(pool).slice(0, QUIZ_LEN).map(a => {
-    const ans = quizSel(quiz.level);
-    const opts = [ans];
-    let guard = 0;
-    while (opts.length < 4 && guard++ < 200) {
-      const s = quiz.level === "basic" || Math.random() < 0.5
-        ? { n: ans.n || 1 + Math.floor(Math.random() * 3), per: rand(LEVELS[quiz.level].periods) } : quizSel(quiz.level);
-      if (quiz.level === "adv") Object.assign(s, { adv: rand(ADVERBS).key, n: null, per: null });
-      if (quiz.level === "basic" && Math.random() < 0.5) s.n = 1 + Math.floor(Math.random() * 3);
-      if (!opts.some(o => selKey(o) === selKey(s))) opts.push(s);
-    }
-    return { a, ans, opts: shuffle(opts) };
-  });
-}
-function renderQuiz() {
-  const root = document.getElementById("quiz");
-  root.innerHTML = "";
-  const head = document.createElement("div");
-  head.className = "quiz-head";
-  const modes = document.createElement("div");
-  modes.className = "cat-switch";
-  [["see", "👀 그림 보고 고르기"], ["listen", "👂 듣고 고르기"]].forEach(([k, l]) => {
-    const b = document.createElement("button");
-    b.className = "cat-btn" + (quiz.mode === k ? " active" : "");
-    b.textContent = l;
-    b.addEventListener("click", () => { quiz.mode = k; startQuiz(); });
-    modes.appendChild(b);
-  });
-  const lvs = document.createElement("div");
-  lvs.className = "cat-switch";
-  Object.entries(LEVELS).forEach(([k, v]) => {
-    const b = document.createElement("button");
-    b.className = "cat-btn lvbtn lv-" + k + (quiz.level === k ? " active" : "");
-    b.textContent = v.label;
-    b.addEventListener("click", () => { quiz.level = k; startQuiz(); });
-    lvs.appendChild(b);
-  });
-  head.append(modes, lvs);
-  root.appendChild(head);
-
-  if (quiz.i >= quiz.qs.length) {
-    const end = document.createElement("div");
-    end.className = "quiz-end";
-    const stars = quiz.score >= 9 ? "⭐⭐⭐" : quiz.score >= 6 ? "⭐⭐" : "⭐";
-    end.innerHTML = `<div class="qe-stars">${stars}</div><div class="qe-score">${quiz.score} / ${quiz.qs.length}</div>
-      <div class="qe-msg">${quiz.score >= 9 ? "Excellent! 빈도 표현 박사예요!" : quiz.score >= 6 ? "Good job! 조금만 더 연습해요!" : "Keep trying! 다시 도전해 봐요!"}</div>`;
-    const again = document.createElement("button");
-    again.className = "btn primary";
-    again.textContent = "🔁 다시 하기";
-    again.addEventListener("click", startQuiz);
-    end.appendChild(again);
-    root.appendChild(end);
-    speak(quiz.score >= 6 ? "Great job!" : "Good try!");
-    return;
-  }
-
-  const q = quiz.qs[quiz.i];
-  const prog = document.createElement("div");
-  prog.className = "quiz-prog";
-  prog.innerHTML = `<span>문제 ${quiz.i + 1} / ${quiz.qs.length}</span><span>점수 ${quiz.score}</span>
-    <div class="qp-bar"><div style="width:${(quiz.i / quiz.qs.length) * 100}%"></div></div>`;
-  root.appendChild(prog);
-
-  const card = document.createElement("div");
-  card.className = "quiz-card";
-  const correctEn = answerEn(q.a, q.ans);
-  if (quiz.mode === "see") {
-    const top = document.createElement("div");
-    top.className = "quiz-top";
-    top.append(makeVisual(q.a, "quiz-pic"), freqVisual(q.ans, q.a.emoji));
-    const ask = document.createElement("div");
-    ask.className = "quiz-ask";
-    ask.innerHTML = `🙋 <b>${questionEn(q.a)}</b><span>그림을 보고 알맞은 대답을 골라요.</span>`;
-    card.append(ask, top);
-    speak(questionEn(q.a));
-  } else {
-    const ask = document.createElement("div");
-    ask.className = "quiz-ask";
-    ask.innerHTML = `👂 <b>잘 듣고 알맞은 빈도 그림을 골라요.</b>`;
-    const again = document.createElement("button");
-    again.className = "btn primary";
-    again.textContent = "🔊 다시 듣기";
-    again.addEventListener("click", () => speak(`${questionEn(q.a)} ${correctEn}`));
-    const top = document.createElement("div");
-    top.className = "quiz-top";
-    top.append(makeVisual(q.a, "quiz-pic"), again);
-    card.append(ask, top);
-    setTimeout(() => speak(`${questionEn(q.a)} ${correctEn}`), 250);
-  }
-  const opts = document.createElement("div");
-  opts.className = "quiz-opts " + quiz.mode;
-  const fb = document.createElement("div");
-  fb.className = "quiz-fb";
-  q.opts.forEach((o, k) => {
-    const b = document.createElement("button");
-    b.className = "quiz-opt";
-    if (quiz.mode === "see") b.innerHTML = `<span class="qo-k">${"ABCD"[k]}</span> ${answerEn(q.a, o)}`;
-    else { b.innerHTML = `<span class="qo-k">${"ABCD"[k]}</span>`; b.appendChild(freqVisual(o, q.a.emoji, true)); }
-    b.addEventListener("click", () => {
-      if (quiz.answered) return;
-      quiz.answered = true;
-      const ok = selKey(o) === selKey(q.ans);
-      if (ok) quiz.score++;
-      opts.querySelectorAll(".quiz-opt").forEach((x, j) => {
-        if (selKey(q.opts[j]) === selKey(q.ans)) x.classList.add("right");
-        else if (x === b) x.classList.add("wrong");
-      });
-      fb.className = "quiz-fb " + (ok ? "good" : "bad");
-      fb.innerHTML = `${ok ? "⭕ 정답!" : "❌ 아쉬워요!"} <b>${correctEn}</b> <span>${answerKo(q.a, q.ans)}</span>`;
-      speak(correctEn);
-      const next = document.createElement("button");
-      next.className = "btn primary";
-      next.textContent = quiz.i < quiz.qs.length - 1 ? "다음 문제 ▶" : "결과 보기 🏁";
-      next.addEventListener("click", () => { quiz.i++; quiz.answered = false; renderQuiz(); });
-      fb.appendChild(next);
-    });
-    opts.appendChild(b);
-  });
-  card.append(opts, fb);
-  root.appendChild(card);
-}
-function startQuiz() { quiz.qs = makeQuiz(); quiz.i = 0; quiz.score = 0; quiz.answered = false; synth.cancel(); renderQuiz(); }
 /* ===========================================================
  * 🎙️ 말하기 연습 (음성 인식으로 정확도 측정 + 내 목소리 녹음)
  * - 음성 인식: Web Speech API (Chrome 권장) + 순서 맞춤·부분 점수·단어별 색깔 피드백
@@ -1436,7 +1311,6 @@ renderReactions();
 renderLadder();
 renderBuilder();
 updateBadges();
-let quizStarted = false;
 
 /* ---------- 탭 전환 ---------- */
 document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -1451,7 +1325,6 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     if (tab === "practice") renderPractice();
     else if (tab === "answer") renderBuilder();
     else if (tab === "ask") { refreshAskCards(); renderPicked(); }
-    else if (tab === "quiz" && !quizStarted) { quizStarted = true; startQuiz(); }
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });

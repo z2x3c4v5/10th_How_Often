@@ -934,42 +934,6 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 .ladder .ex::before { content: "🔊 "; }
 @media (max-width: 760px) { .freq-ladder { grid-template-columns: 1fr; } }
 
-/* 🎯 퀴즈 */
-.quiz-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin-bottom: 10px; }
-.cat-btn.lvbtn.lv-basic.active { background: linear-gradient(135deg, #4ade80, #16a34a); }
-.cat-btn.lvbtn.lv-mid.active { background: linear-gradient(135deg, #2dd4bf, #0f766e); }
-.cat-btn.lvbtn.lv-adv.active { background: linear-gradient(135deg, #a78bfa, #6d28d9); }
-.quiz-prog { display: flex; flex-wrap: wrap; justify-content: space-between; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; }
-.qp-bar { flex-basis: 100%; height: 10px; background: #e0f2fe; border-radius: 999px; margin-top: 6px; overflow: hidden; }
-.qp-bar div { height: 100%; background: linear-gradient(90deg, #38bdf8, #4f46e5); transition: width 0.3s; }
-.quiz-card { background: rgba(255,255,255,0.92); border-radius: 24px; padding: 18px; box-shadow: var(--shadow); }
-.quiz-ask { font-size: 1.25rem; margin-bottom: 12px; }
-.quiz-ask span { display: block; font-size: 0.9rem; color: var(--muted); margin-top: 2px; }
-.quiz-top { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 14px; align-items: center; }
-.quiz-pic { height: 140px; margin: 0; border-radius: 14px; }
-.quiz-top > .btn { justify-self: start; font-size: 1.1rem; }
-.quiz-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
-.quiz-opt { border: 2.5px solid #bae6fd; background: #fff; border-radius: 16px; padding: 12px; font: inherit; font-size: 1.08rem; font-weight: 700; color: var(--text); cursor: pointer; text-align: left; }
-.quiz-opt:hover { border-color: var(--primary); }
-.quiz-opt.right { border-color: var(--pos); background: #ecfdf5; }
-.quiz-opt.wrong { border-color: var(--neg); background: #fff1f2; }
-.quiz-opt .fv { margin-top: 6px; padding: 6px; }
-.quiz-opt .fv-cells.month .fv-lab { display: none; }
-.qo-k { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.9rem; margin-right: 4px; }
-.quiz-fb { margin-top: 14px; font-size: 1.1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.quiz-fb span { color: var(--muted); font-size: 0.95rem; }
-.quiz-fb.good { color: var(--pos); } .quiz-fb.bad { color: var(--neg); }
-.quiz-fb .btn { margin-left: auto; }
-.quiz-end { text-align: center; background: #fff; border-radius: 24px; padding: 30px 16px; box-shadow: var(--shadow); }
-.qe-stars { font-size: 3rem; }
-.qe-score { font-size: 2.4rem; font-weight: 800; color: var(--primary-dark); }
-.qe-msg { margin: 8px 0 16px; font-size: 1.1rem; }
-@media (max-width: 640px) {
-  .quiz-top { grid-template-columns: 1fr; }
-  .quiz-pic { max-width: 220px; height: 120px; }
-  .quiz-opts { grid-template-columns: 1fr; }
-}
-
 /* 📝 습관표 */
 .plan-row { grid-template-columns: 90px 1fr 110px 40px; }
 .plan-re { font-size: 0.92rem; font-weight: 700; color: #b45309; margin-top: 4px; }

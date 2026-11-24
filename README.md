@@ -16,8 +16,8 @@
 
 | 수준 | 빈도 표현 | 예시 |
 |------|-----------|------|
-| 🌱 초급 | once · twice · three times × a day · a week | I brush my teeth **twice a day**. |
-| 🌿 중급 | once ~ ten times × a day · a week · a month · a year, every day · every weekend, **more often / less often**, I'll try. | I go to the dentist **twice a year**. / You should play computer games **less often**. |
+| 🌱 초급 | once ~ six times × a day · a week | I brush my teeth **twice a day**. |
+| 🌿 중급 | once ~ six times × a day · a week · a month · a year, every day · every weekend, **more often / less often**, I'll try. | I go to the dentist **twice a year**. / You should play computer games **less often**. |
 | 🌳 고급 | 빈도부사 **always(100%) · usually(80%) · often(60%) · sometimes(30%) · never(0%)** + 횟수 + 언제·누구와 + 이유 한 문장 | I **usually** ride my bike twice a week **with my friends**. **It's fun.** |
 
 ## 기능 — 질문 고르기 → 대답 만들기 → 연습하기
@@ -25,13 +25,12 @@
 1. ❓ **질문 고르기** — 활동 종류(📘 교과서 · 🧒 우리 생활 20 · 🍎 건강 · 🏠 집·공부 · ⚽ 운동·취미 · 👨‍👩‍👧 나들이)별 질문 카드 57개
    - 카드의 **✅ 이 질문 고르기**로 친구에게 물어볼 질문을 **최대 5개** 고름 · 아래 **고른 질문** 막대에서 확인하고 ✕로 빼기
    - 📘 교과서 대화 5개 · 핵심 낱말 7개 다시 보기
-2. ✍️ **대답 만들기** — 고른 질문마다 수준(🌱 초급 · 🌿 중급 · 🌳 고급)을 정하고 빈도를 골라 **I ___ (몇 번) (언제마다).** 대답 완성
+2. ✍️ **대답 만들기** — 고른 질문마다 **🔢 몇 번?**(once ~ six times)과 **📅 언제마다?**(a day · a week …)를 따로 골라 **I ___ (몇 번) (언제마다).** 대답 완성 · 수준(🌱 초급 · 🌿 중급 · 🌳 고급)에 따라 쓸 수 있는 표현이 늘어남
    - 말풍선 대화(질문 → 내 대답 → 친구 반응 → I'll try.)와 📅 빈도 그림이 바로 바뀜 · 🎲 예시로 채우기 · 다음 질문 ▶
    - 💡 빈도 표현 · 반응 표현 도움말 · 📝 **공책에 적기** 표(질문 · 내 대답)
 3. 🎤 **연습하기** — 만든 대화마다 **🔊 대화 듣기** · **🎙️ 연습하기** 버튼
    - 🎙️ 연습하기를 누르면 줄마다 말하기(정확도 · 단어별 피드백 · 녹음해서 다시 듣기)와 🎭 역할극(내가 묻는 사람 / 대답하는 사람) 버튼이 나옴
    - 👫 짝 활동 카드: 내가 묻기 → 친구 대답 적기 → 반응하기 · 내 대답
-- 🎯 **빈도 퀴즈** (수준별 10문제) — 👀 그림 보고 고르기 / 👂 듣고 고르기
 - 단어 클릭 시 **뜻 풍선 + 발음**, 말하기 **속도 조절** · 고른 질문과 대답, 연습 기록은 브라우저에 저장
 
 ## 🧒 우리 생활 표현 20개

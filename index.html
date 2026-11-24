@@ -22,7 +22,6 @@
     <button class="tab-btn active" data-tab="ask">❓ <span class="tab-long">1. 질문 고르기</span><span class="tab-short">1. 질문</span> <span id="q-count" class="tab-count">0/5</span></button>
     <button class="tab-btn" data-tab="answer">✍️ <span class="tab-long">2. 대답 만들기</span><span class="tab-short">2. 대답</span> <span id="a-count" class="tab-count">0/0</span></button>
     <button class="tab-btn" data-tab="practice">🎤 <span class="tab-long">3. 연습하기</span><span class="tab-short">3. 연습</span></button>
-    <button class="tab-btn" data-tab="quiz">🎯 <span class="tab-long">빈도 퀴즈</span><span class="tab-short">퀴즈</span></button>
   </nav>
 
   <div class="toolbar">
@@ -60,7 +59,7 @@
     <section id="tab-answer" class="tab-panel">
       <div class="section-block">
         <h2>✍️ 2. 대답 만들기 · I ___ (몇 번) (언제마다). <span class="count" id="answer-count"></span></h2>
-        <p class="hint">고른 질문마다 <b>나는 얼마나 자주 하는지</b> 빈도를 골라 대답을 만들어요. 수준(🌱 초급 · 🌿 중급 · 🌳 고급)을 고르면 쓸 수 있는 빈도 표현이 달라져요. 대답을 만들면 친구의 반응(<b>Good for you!</b> / <b>You should ~ more often.</b> → <b>I'll try.</b>)이 저절로 이어져요.</p>
+        <p class="hint">고른 질문마다 <b>나는 얼마나 자주 하는지</b> 빈도를 골라 대답을 만들어요. <b>몇 번?</b>(once ~ six times)과 <b>언제마다?</b>(a day · a week …)를 따로따로 골라요. 수준(🌱 초급 · 🌿 중급 · 🌳 고급)을 고르면 쓸 수 있는 표현이 달라져요. 대답을 만들면 친구의 반응(<b>Good for you!</b> / <b>You should ~ more often.</b> → <b>I'll try.</b>)이 저절로 이어져요.</p>
         <div id="answer-empty" class="practice-empty">아직 고른 질문이 없어요! <b>❓ 1. 질문 고르기</b>에서 질문을 먼저 골라요.<br><button class="btn primary go-ask">❓ 질문 고르러 가기</button></div>
         <div id="answer-main">
           <div class="set-tabs" id="set-tabs"></div>
@@ -128,8 +127,6 @@
       </div>
     </section>
 
-    <!-- ===== 🎯 빈도 퀴즈 ===== -->
-    <section id="tab-quiz" class="tab-panel"><div id="quiz"></div></section>
   </main>
 
   <div id="toast" class="toast hidden"></div>

@@ -5,8 +5,8 @@
  * - 반응 : Good for you! / You should brush your teeth more often. — I'll try.
  *
  * 수준
- *  🌱 초급 : once · twice · three times  ×  a day · a week
- *  🌿 중급 : once ~ ten times  ×  a day · a week · a month · a year  (+ every day · every weekend)
+ *  🌱 초급 : once ~ six times  ×  a day · a week   (몇 번 · 언제마다를 따로 골라요)
+ *  🌿 중급 : once ~ six times  ×  a day · a week · a month · a year  (+ every day · every weekend)
  *  🌳 고급 : always · usually · often · sometimes · never  + 횟수 + 언제·누구와 + 이유 한 문장
  *
  * ※ 그림: images/활동id.png (Canva로 만든 그림). 그림이 없으면 이모지로 보여 줘요.
@@ -166,9 +166,9 @@ const REACTIONS = [
 
 /* ===== 수준별 설정 ===== */
 const LEVELS = {
-  basic: { label: "🌱 초급", nums: [1, 2, 3],                      periods: ["day", "week"],                 every: [] },
-  mid:   { label: "🌿 중급", nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], periods: ["day", "week", "month", "year"], every: ["everyday", "everyweekend"] },
-  adv:   { label: "🌳 고급", nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], periods: ["day", "week", "month", "year"], every: ["everyday", "everyweekend"] },
+  basic: { label: "🌱 초급", nums: [1, 2, 3, 4, 5, 6], periods: ["day", "week"],                 every: [] },
+  mid:   { label: "🌿 중급", nums: [1, 2, 3, 4, 5, 6], periods: ["day", "week", "month", "year"], every: ["everyday", "everyweekend"] },
+  adv:   { label: "🌳 고급", nums: [1, 2, 3, 4, 5, 6], periods: ["day", "week", "month", "year"], every: ["everyday", "everyweekend"] },
 };
 
 /* ===== 📘 교과서 대화 ===== */
