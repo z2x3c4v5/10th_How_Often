@@ -3,8 +3,8 @@
  * - 음성 출력: Web Speech API (SpeechSynthesis)
  * - 단어 클릭: 단어 발음 + 뜻 풍선(popup)
  * - 그림: Canva로 만든 활동 그림 images/활동id.png (없으면 이모지)
- * - 🔁 묻고 답하기(초급·중급·고급 카드 + 📘 교과서 대화) · 💬 빈도·반응 표현
- * - 📅 내 생활 습관 만들기(3개) + 📝 공책에 적기 · 🎤 연습·짝 활동(역할극) · 🎯 빈도 퀴즈
+ * - ❓ 1. 질문 고르기(최대 5개, 📘 교과서 대화 포함) → ✍️ 2. 대답 만들기(수준·빈도, 📝 공책에 적기)
+ *   → 🎤 3. 연습하기(🎙️ 연습하기 · 🎭 역할극 · 👫 짝 활동 카드) · 🎯 빈도 퀴즈
  * ========================================================= */
 
 /* ---------- 음성 합성 (TTS) ---------- */
@@ -507,6 +507,7 @@ function makeCard(item, opts) {
     box.append(txt, sb);
     div.appendChild(box);
   });
+  if (opts.extra) div.appendChild(opts.extra);
   if (opts.note) {
     const n = document.createElement("div");
     n.className = "card-note";
@@ -517,46 +518,110 @@ function makeCard(item, opts) {
 }
 
 /* ===========================================================
- * 🔁 묻고 답하기 : 난이도(초급/중급/고급) × 활동 종류
+ * 내가 고른 질문과 대답 (저장)
+ *  myQs = [{ id, level, sel }]  — 1. 질문 고르기에서 담고, 2. 대답 만들기에서 sel 을 채워요
  * =========================================================== */
-let cardLevel = "basic";
+const MAX_Q = 5;
+let myQs = [];
+try { myQs = JSON.parse(localStorage.getItem("howoften_qa") || "[]") || []; } catch (e) {}
+myQs = (Array.isArray(myQs) ? myQs : []).filter(q => q && findAct(q.id)).slice(0, MAX_Q)
+  .map(q => ({ id: q.id, level: LEVELS[q.level] ? q.level : "basic", sel: q.sel || {} }));
+function persist() { try { localStorage.setItem("howoften_qa", JSON.stringify(myQs)); } catch (e) {} }
+const qAct = q => findAct(q.id);
+const qDone = q => isComplete(q.sel);
+const doneCount = () => myQs.filter(qDone).length;
+const isPicked = id => myQs.some(q => q.id === id);
+function updateBadges() {
+  document.getElementById("q-count").textContent = `${myQs.length}/${MAX_Q}`;
+  document.getElementById("a-count").textContent = `${doneCount()}/${myQs.length}`;
+}
+function goTab(tab) { document.querySelector(`.tab-btn[data-tab="${tab}"]`).click(); }
+
+/* ===========================================================
+ * ❓ 1. 질문 고르기 : 활동 종류별 질문 카드 → ✅ 이 질문 고르기
+ * =========================================================== */
 let cardCat = "all";
 const CARD_CATS = [{ key: "all", label: "전체" }, { key: "book", label: "📘 교과서 표현" }, { key: "life", label: "🧒 우리 생활 20" }, ...ACT_CATS];
-const CARD_HINT = {
-  basic: "<b>초급</b>: <b>once · twice · three times</b> + <b>a day · a week</b> 로 대답해요. (예: I brush my teeth <b>three times a day</b>.)",
-  mid: "<b>중급</b>: <b>four ~ ten times</b>, <b>a month · a year</b>, <b>every day</b> 까지 써서 대답해요. (예: I go to the dentist <b>twice a year</b>.)",
-  adv: "<b>고급</b>: <b>always · usually · often · sometimes</b> 를 넣고, <b>언제·누구와</b>와 <b>이유</b>를 한 문장 더 말해요.",
-};
-function renderCards() {
-  document.querySelectorAll("#level-switch .level-btn").forEach(b => b.classList.toggle("active", b.dataset.level === cardLevel));
+function toggleQuestion(a) {
+  const i = myQs.findIndex(q => q.id === a.id);
+  if (i >= 0) {
+    myQs.splice(i, 1);
+    if (curQ >= myQs.length) curQ = Math.max(0, myQs.length - 1);
+    toast(`${a.emoji} 질문을 뺐어요.`);
+  } else {
+    if (myQs.length >= MAX_Q) { toast(`질문은 ${MAX_Q}개까지 고를 수 있어요. 다른 질문을 빼고 골라 주세요.`); return; }
+    myQs.push({ id: a.id, level: "basic", sel: {} });
+    toast(`✅ ${questionEn(a)} → 고른 질문에 담았어요! (${myQs.length}/${MAX_Q})`);
+    speak(questionEn(a));
+  }
+  persist();
+  refreshAskCards();
+  renderPicked();
+  updateBadges();
+}
+function refreshAskCards() {
+  document.querySelectorAll("#card-grid .card").forEach(c => {
+    const on = isPicked(c.dataset.act);
+    c.classList.toggle("picked", on);
+    const b = c.querySelector(".pick-btn");
+    b.classList.toggle("on", on);
+    b.textContent = on ? `✓ 고른 질문 ${myQs.findIndex(q => q.id === c.dataset.act) + 1} (빼기)` : "✅ 이 질문 고르기";
+  });
+}
+function renderAskCards() {
   const cats = document.getElementById("card-cats");
   cats.innerHTML = "";
   CARD_CATS.forEach(c => {
     const b = document.createElement("button");
     b.className = "cat-btn" + (cardCat === c.key ? " active" : "");
     b.textContent = c.label;
-    b.addEventListener("click", () => { cardCat = c.key; synth.cancel(); hidePopup(); renderCards(); });
+    b.addEventListener("click", () => { cardCat = c.key; synth.cancel(); hidePopup(); renderAskCards(); });
     cats.appendChild(b);
   });
-  document.getElementById("card-hint").innerHTML = CARD_HINT[cardLevel] +
-    " <b>📘</b> 는 교과서 표현, <b>🧒</b> 는 우리 생활 표현이에요. 단어를 누르면 뜻과 발음을 알 수 있어요. 마음에 드는 활동은 <b>📅 내 생활 습관 만들기</b>에서 골라요.";
   const grid = document.getElementById("card-grid");
   grid.innerHTML = "";
-  const list = levelActs(cardLevel).filter(a => cardCat === "all" || (cardCat === "book" ? a.book : cardCat === "life" ? a.life : a.cat === cardCat));
+  const list = ACTIVITIES.filter(a => cardCat === "all" || (cardCat === "book" ? a.book : cardCat === "life" ? a.life : a.cat === cardCat));
   list.forEach((a, i) => {
-    const sel = exampleSel(a, cardLevel);
-    const card = makeCard({ id: a.id, emoji: a.emoji, lines: [
-      { label: "Q", en: questionEn(a), ko: questionKo(a) },
-      { label: "A", en: answerEn(a, sel), ko: answerKo(a, sel) },
-    ] }, { tone: i % 6, tag: actTag(a) });
+    const btn = document.createElement("button");
+    btn.className = "pick-btn";
+    btn.addEventListener("click", () => toggleQuestion(a));
+    const card = makeCard({ id: a.id, emoji: a.emoji, en: questionEn(a), ko: questionKo(a) },
+      { tone: i % 6, tag: actTag(a), extra: btn });
+    card.dataset.act = a.id;
     if (a.book) card.classList.add("textbook");
     grid.appendChild(card);
   });
   document.getElementById("card-count").textContent = `${list.length}개`;
+  refreshAskCards();
 }
-document.querySelectorAll("#level-switch .level-btn").forEach(btn => {
-  btn.addEventListener("click", () => { cardLevel = btn.dataset.level; synth.cancel(); hidePopup(); renderCards(); });
-});
+/* 아래에 붙는 "고른 질문" 막대 */
+function renderPicked() {
+  const bar = document.getElementById("picked-bar");
+  bar.innerHTML = "";
+  const title = document.createElement("div");
+  title.className = "pb-title";
+  title.innerHTML = `📋 고른 질문 <b>${myQs.length}/${MAX_Q}</b>`;
+  const list = document.createElement("div");
+  list.className = "pb-list";
+  if (!myQs.length) list.innerHTML = '<span class="pb-empty">위 카드에서 ✅ 이 질문 고르기를 눌러요</span>';
+  myQs.forEach((q, i) => {
+    const a = qAct(q);
+    const chip = document.createElement("span");
+    chip.className = "pb-chip";
+    chip.innerHTML = `<b>${i + 1}</b> ${a.emoji} ${a.q}`;
+    const x = document.createElement("button");
+    x.className = "pb-x"; x.textContent = "✕"; x.title = "빼기";
+    x.addEventListener("click", () => toggleQuestion(a));
+    chip.appendChild(x);
+    list.appendChild(chip);
+  });
+  const go = document.createElement("button");
+  go.className = "btn primary pb-go";
+  go.textContent = "✍️ 2. 대답 만들러 가기 ▶";
+  go.disabled = !myQs.length;
+  go.addEventListener("click", () => goTab("answer"));
+  bar.append(title, list, go);
+}
 
 /* ===========================================================
  * 📘 교과서 대화 · 핵심 낱말
@@ -615,53 +680,12 @@ function renderBook() {
 }
 
 /* ===========================================================
- * 💬 빈도·반응 표현
+ * 💡 빈도 표현 · 반응 표현 도움말
  * =========================================================== */
-const freqFill = { act: findAct("exercise"), sel: {} };
-function renderFreqFill() {
-  const box = document.getElementById("freq-fill");
-  box.innerHTML = `
-    <div class="fill-pattern ff-pattern"></div>
-    <div class="fill-ko ff-ko"></div>
-    <div class="chip-group-title">🏃 활동 고르기 <small>(📘 교과서 표현)</small></div>
-    <div class="chip-row wrap ff-acts"></div>
-    <div class="ho-chips ff-chips"></div>
-    <div class="ff-vis"></div>
-    <div class="fill-actions">
-      <button class="btn primary ff-listen">🔊 문장 듣기</button>
-      <button class="btn ghost ff-random">🎲 다른 활동</button>
-      <button class="btn ghost ff-reset">↺ 빈도 지우기</button>
-    </div>`;
-  const $ = s => box.querySelector(s);
-  const a = freqFill.act, sel = freqFill.sel;
-  const done = isComplete(sel);
-  const pat = $(".ff-pattern");
-  if (done) pat.appendChild(buildWords(answerEn(a, sel)));
-  else pat.innerHTML = `I ${a.a} <span class="blank">________</span>.`;
-  $(".ff-ko").textContent = done ? answerKo(a, sel) : `나는 ________ ${a.koA}.`;
-  const acts = $(".ff-acts");
-  const pool = ACTIVITIES.filter(x => x.book).concat(a.book ? [] : [a]);
-  pool.forEach(x => {
-    const c = document.createElement("button");
-    c.className = "chip act" + (x.id === a.id ? " on" : "");
-    c.textContent = `${x.emoji} ${x.a}`;
-    c.addEventListener("click", () => { freqFill.act = x; renderFreqFill(); speak(questionEn(x)); });
-    acts.appendChild(c);
-  });
-  renderFreqChips($(".ff-chips"), "adv", sel, () => { renderFreqFill(); if (isComplete(sel)) speak(answerEn(freqFill.act, sel)); });
-  $(".ff-vis").appendChild(freqVisual(sel, a.emoji));
-  $(".ff-listen").disabled = !done;
-  $(".ff-listen").addEventListener("click", () => done && speak(answerEn(a, sel)));
-  $(".ff-random").addEventListener("click", () => {
-    const x = rand(ACTIVITIES.filter(y => y.id !== a.id && y.lv === 1));
-    freqFill.act = x; freqFill.sel = exampleSel(x, "mid"); renderFreqFill(); speak(answerEn(x, freqFill.sel));
-  });
-  $(".ff-reset").addEventListener("click", () => { freqFill.sel = {}; renderFreqFill(); });
-}
 function renderReactions() {
   const grid = document.getElementById("reaction-grid");
   grid.innerHTML = "";
-  REACTIONS.forEach((r, i) => grid.appendChild(makeCard({ emoji: r.emoji, en: r.en, ko: r.ko }, { tone: i % 6, tag: r.when, note: "" })));
+  REACTIONS.forEach((r, i) => grid.appendChild(makeCard({ emoji: r.emoji, en: r.en, ko: r.ko }, { tone: i % 6, tag: r.when })));
   document.getElementById("reaction-count").textContent = `${REACTIONS.length}개`;
 }
 function renderLadder() {
@@ -683,114 +707,89 @@ function renderLadder() {
 }
 
 /* ===========================================================
- * 📅 내 생활 습관 만들기 (3개) · 저장
+ * ✍️ 2. 대답 만들기 : 고른 질문마다 수준 + 빈도 → 대화 완성
  * =========================================================== */
-const SET_COUNT = 3;
-let mySets = [];   // [{ id, level, sel }]
-let curSet = 0;
-try { mySets = JSON.parse(localStorage.getItem("howoften_sets") || "[]") || []; } catch (e) {}
-mySets = Array.from({ length: SET_COUNT }, (_, i) => {
-  const s = mySets[i] || {};
-  return { id: findAct(s.id) ? s.id : null, level: LEVELS[s.level] ? s.level : "basic", sel: s.sel || {} };
-});
-function persist() { try { localStorage.setItem("howoften_sets", JSON.stringify(mySets)); } catch (e) {} }
-const setAct = s => s.id ? findAct(s.id) : null;
-const setComplete = s => !!(setAct(s) && isComplete(s.sel));
-const completeCount = () => mySets.filter(setComplete).length;
-
-function updateSetBadge() {
-  document.getElementById("set-count").textContent = `${completeCount()}/${SET_COUNT}`;
+let curQ = 0;
+let setView = null;
+function renderAnswerTabs() {
   const tabs = document.getElementById("set-tabs");
   tabs.innerHTML = "";
-  mySets.forEach((s, i) => {
-    const a = setAct(s);
+  myQs.forEach((q, i) => {
+    const a = qAct(q);
     const b = document.createElement("button");
-    b.className = "set-tab" + (i === curSet ? " active" : "") + (setComplete(s) ? " done" : "");
-    b.textContent = `습관 ${i + 1} ${a ? a.emoji : ""}${setComplete(s) ? " ✓" : ""}`;
-    b.addEventListener("click", () => { curSet = i; synth.cancel(); renderBuilder(); });
+    b.className = "set-tab" + (i === curQ ? " active" : "") + (qDone(q) ? " done" : "");
+    b.textContent = `질문 ${i + 1} ${a.emoji}${qDone(q) ? " ✓" : ""}`;
+    b.addEventListener("click", () => { curQ = i; synth.cancel(); renderBuilder(); speak(questionEn(a)); });
     tabs.appendChild(b);
   });
 }
-let setView = null;
 function renderSetPreview() {
-  const s = mySets[curSet], a = setAct(s);
+  const q = myQs[curQ], a = qAct(q);
   const pic = document.getElementById("set-pic");
   pic.innerHTML = "";
-  if (a) pic.appendChild(makeVisual(a, "ho-visual"));
-  else { const e = document.createElement("div"); e.className = "set-pic-empty"; e.textContent = "❔"; pic.appendChild(e); }
-  setView = renderDialogue(document.getElementById("set-dialogue"), a, s.sel);
+  pic.appendChild(makeVisual(a, "ho-visual"));
+  setView = renderDialogue(document.getElementById("set-dialogue"), a, q.sel);
   const vis = document.getElementById("set-vis");
   vis.innerHTML = "";
-  if (a) vis.appendChild(freqVisual(s.sel, a.emoji));
+  vis.appendChild(freqVisual(q.sel, a.emoji));
   const st = document.getElementById("set-status");
-  const n = completeCount();
-  if (!a) { st.className = "dlg-status"; st.textContent = "👇 아래에서 1️⃣ 활동을 골라요"; }
-  else if (!isComplete(s.sel)) { st.className = "dlg-status"; st.textContent = "👇 2️⃣ 빈도를 골라 내 대답을 완성해요"; }
+  const n = doneCount(), total = myQs.length;
+  if (!qDone(q)) { st.className = "dlg-status"; st.textContent = "👆 빈도를 골라 내 대답을 완성해요"; }
   else {
-    const re = reaction(a, s.sel);
+    const re = reaction(a, q.sel);
     st.className = "dlg-status ok " + re.mood;
-    st.textContent = (re.mood === "more" ? "💪 친구가 더 자주 하라고 충고해요. → I'll try! " : re.mood === "less" ? "⚠️ 친구가 덜 하라고 충고해요. → I'll try! " : "✅ 완성! ") +
-      (n < SET_COUNT ? `(${n}/${SET_COUNT}) 다음 습관도 만들어 볼까요?` : "🎉 3개 모두 완성! 🎤 연습 · 짝 활동으로 가요.");
+    st.textContent = (re.mood === "more" ? "💪 친구가 더 자주 하라고 충고해요. → I'll try! " : re.mood === "less" ? "⚠️ 친구가 덜 하라고 충고해요. → I'll try! " : "✅ 대답 완성! ") +
+      (n < total ? `(${n}/${total}) 다음 질문도 대답해 볼까요?` : "🎉 모든 질문에 대답했어요! 🎤 3. 연습하기로 가요.");
   }
-  document.getElementById("set-listen").disabled = !(a && isComplete(s.sel));
+  document.getElementById("set-listen").disabled = !qDone(q);
+  const next = document.getElementById("set-next");
+  next.hidden = total < 2;
+  next.textContent = curQ < total - 1 ? "다음 질문 ▶" : "처음 질문으로 ↺";
 }
 function renderBuilder() {
-  const s = mySets[curSet];
+  updateBadges();
+  const empty = document.getElementById("answer-empty"), main = document.getElementById("answer-main");
+  document.getElementById("answer-count").textContent = `${doneCount()}/${myQs.length}`;
+  document.getElementById("go-practice").disabled = doneCount() === 0;
+  renderSheetSummary();
+  if (!myQs.length) { empty.hidden = false; main.hidden = true; return; }
+  empty.hidden = true; main.hidden = false;
+  curQ = Math.min(curQ, myQs.length - 1);
+  const q = myQs[curQ];
   const lv = document.getElementById("set-level");
   lv.innerHTML = "";
   Object.keys(LEVELS).forEach(k => {
     const b = document.createElement("button");
-    b.className = "cat-btn lvbtn lv-" + k + (s.level === k ? " active" : "");
+    b.className = "cat-btn lvbtn lv-" + k + (q.level === k ? " active" : "");
     b.textContent = LEVEL_LABEL[k];
-    b.addEventListener("click", () => {
-      s.level = k; fitSel(s.sel, k);
-      const a = setAct(s); if (a && !levelActs(k).includes(a)) s.id = null;
-      persist(); renderBuilder();
-    });
+    b.addEventListener("click", () => { q.level = k; fitSel(q.sel, k); persist(); renderBuilder(); });
     lv.appendChild(b);
   });
-  const wrap = document.getElementById("build-acts");
-  wrap.innerHTML = "";
-  const used = new Set(mySets.filter((x, i) => i !== curSet).map(x => x.id).filter(Boolean));
-  const acts = levelActs(s.level);
-  [{ key: "book", label: "📘 교과서 표현", f: a => a.book }, { key: "life", label: "🧒 우리 생활 표현", f: a => a.life }]
-    .concat(ACT_CATS.map(c => ({ key: c.key, label: c.label, f: a => !a.book && !a.life && a.cat === c.key })))
-    .forEach(g => {
-      const items = acts.filter(g.f);
-      if (!items.length) return;
-      const t = document.createElement("div"); t.className = "chip-group-title"; t.textContent = g.label;
-      const row = document.createElement("div"); row.className = "chip-row wrap";
-      items.forEach(a => {
-        const c = document.createElement("button");
-        c.className = "chip act" + (s.id === a.id ? " on" : "") + (used.has(a.id) ? " used" : "");
-        if (used.has(a.id)) c.title = "다른 습관에서 이미 골랐어요";
-        c.textContent = `${a.emoji} ${a.q}`;
-        c.addEventListener("click", () => { s.id = a.id; persist(); renderBuilder(); speak(questionEn(a)); });
-        row.appendChild(c);
-      });
-      wrap.append(t, row);
-    });
-  renderFreqChips(document.getElementById("build-freq"), s.level, s.sel, () => {
+  renderFreqChips(document.getElementById("build-freq"), q.level, q.sel, () => {
     persist(); renderBuilder();
-    const a = setAct(s); if (a && isComplete(s.sel)) speak(answerEn(a, s.sel));
+    if (qDone(q)) speak(answerEn(qAct(q), q.sel));
   });
-  updateSetBadge();
+  renderAnswerTabs();
   renderSetPreview();
-  renderSheetSummary();
 }
 document.getElementById("set-listen").addEventListener("click", () => { if (setView && setView.done) playLines(setView.rows, setView.lines); });
 document.getElementById("set-random").addEventListener("click", () => {
-  const s = mySets[curSet];
-  const used = new Set(mySets.filter((x, i) => i !== curSet).map(x => x.id));
-  const a = rand(levelActs(s.level).filter(x => !used.has(x.id)));
-  s.id = a.id; s.sel = exampleSel(a, s.level);
+  const q = myQs[curQ]; if (!q) return;
+  q.sel = exampleSel(qAct(q), q.level);
   persist(); renderBuilder();
-  speak(dialogLines(a, s.sel).map(l => l.en).join(" "));
+  speak(dialogLines(qAct(q), q.sel).map(l => l.en).join(" "));
 });
 document.getElementById("set-clear").addEventListener("click", () => {
-  mySets[curSet] = { id: null, level: mySets[curSet].level, sel: {} };
-  persist(); synth.cancel(); renderBuilder();
+  const q = myQs[curQ]; if (!q) return;
+  q.sel = {}; persist(); synth.cancel(); renderBuilder();
 });
+document.getElementById("set-next").addEventListener("click", () => {
+  if (!myQs.length) return;
+  curQ = (curQ + 1) % myQs.length; synth.cancel(); renderBuilder(); speak(questionEn(qAct(myQs[curQ])));
+});
+document.getElementById("go-practice").addEventListener("click", () => goTab("practice"));
+document.querySelectorAll(".go-ask").forEach(b => b.addEventListener("click", () => goTab("ask")));
+document.querySelectorAll(".go-answer").forEach(b => b.addEventListener("click", () => goTab("answer")));
 
 /* 📝 공책에 적기 */
 function sheetRow(label, en, ko) {
@@ -802,7 +801,7 @@ function sheetRow(label, en, ko) {
     const e = document.createElement("div"); e.className = "en"; e.appendChild(buildWords(en));
     const k = document.createElement("div"); k.className = "ko"; k.textContent = ko;
     val.append(e, k);
-  } else val.textContent = "아직 고르지 않았어요";
+  } else val.textContent = "아직 만들지 않았어요";
   const btn = document.createElement("button");
   btn.className = "speak-btn small"; btn.textContent = "🔊"; btn.disabled = !en;
   btn.addEventListener("click", () => en && speak(en));
@@ -812,10 +811,11 @@ function sheetRow(label, en, ko) {
 function renderSheetSummary() {
   const box = document.getElementById("sheet-summary");
   box.innerHTML = "";
-  mySets.forEach((s, i) => {
-    const a = setAct(s), ok = setComplete(s);
-    box.appendChild(sheetRow(`질문 ${i + 1}`, a && questionEn(a), a && questionKo(a)));
-    box.appendChild(sheetRow(`내 대답 ${i + 1}`, ok && answerEn(a, s.sel), ok && answerKo(a, s.sel)));
+  if (!myQs.length) { box.innerHTML = '<p class="practice-empty">질문을 고르면 여기에 정리돼요.</p>'; return; }
+  myQs.forEach((q, i) => {
+    const a = qAct(q), ok = qDone(q);
+    box.appendChild(sheetRow(`질문 ${i + 1}`, questionEn(a), questionKo(a)));
+    box.appendChild(sheetRow(`내 대답 ${i + 1}`, ok && answerEn(a, q.sel), ok && answerKo(a, q.sel)));
   });
 }
 
@@ -825,22 +825,22 @@ function renderSheetSummary() {
 function renderPairCards() {
   const box = document.getElementById("pair-cards");
   box.innerHTML = "";
-  const done = mySets.map((s, i) => [s, i]).filter(([s]) => setComplete(s));
+  const done = myQs.map((q, i) => [q, i]).filter(([q]) => qDone(q));
   if (!done.length) {
     const p = document.createElement("p"); p.className = "practice-empty";
-    p.innerHTML = "아직 만든 습관이 없어요! <b>📅 내 생활 습관 만들기</b>에서 먼저 만들어요.";
+    p.innerHTML = "대답을 만들면 짝 활동 카드가 나와요.";
     box.appendChild(p); return;
   }
-  done.forEach(([s, i]) => {
-    const a = setAct(s);
+  done.forEach(([q, i]) => {
+    const a = qAct(q);
     const card = document.createElement("div");
     card.className = "pair-card tone-" + (i % 6);
     const head = document.createElement("div"); head.className = "pair-head";
     head.innerHTML = `<span class="card-tag tag-combo">질문 ${i + 1}</span><span class="pair-emoji">${a.emoji}</span>`;
     const ask = document.createElement("div"); ask.className = "pair-line me";
     ask.innerHTML = `<div class="pair-who">🙋 내가 묻기</div>`;
-    const q = document.createElement("div"); q.className = "pair-en"; q.appendChild(buildWords(questionEn(a)));
-    ask.appendChild(q);
+    const qq = document.createElement("div"); qq.className = "pair-en"; qq.appendChild(buildWords(questionEn(a)));
+    ask.appendChild(qq);
     const fr = document.createElement("div"); fr.className = "pair-line friend";
     fr.innerHTML = `<div class="pair-who">🙆 친구의 대답 적기</div>
       <div class="pair-write">친구 이름: <span class="write-line"></span></div>
@@ -850,13 +850,13 @@ function renderPairCards() {
       <div class="pair-choice"><span class="pair-ok">👍 Good for you!</span><span class="pair-no">💪 You should ${a.q} more often.</span></div>`;
     const mine = document.createElement("div"); mine.className = "pair-line mine";
     mine.innerHTML = `<div class="pair-who">🙆 친구가 나에게 물으면 · 내 대답</div>`;
-    const m = document.createElement("div"); m.className = "pair-en small"; m.appendChild(buildWords(answerEn(a, s.sel)));
+    const m = document.createElement("div"); m.className = "pair-en small"; m.appendChild(buildWords(answerEn(a, q.sel)));
     mine.appendChild(m);
     const tools = document.createElement("div"); tools.className = "ptools";
     const b1 = document.createElement("button"); b1.className = "btn small primary"; b1.textContent = "🔊 질문 듣기";
     b1.addEventListener("click", () => speak(questionEn(a)));
     const b2 = document.createElement("button"); b2.className = "btn small"; b2.textContent = "🔊 내 대답 듣기";
-    b2.addEventListener("click", () => speak(answerEn(a, s.sel)));
+    b2.addEventListener("click", () => speak(answerEn(a, q.sel)));
     tools.append(b1, b2);
     card.append(head, ask, fr, re, mine, tools);
     box.appendChild(card);
@@ -1278,9 +1278,9 @@ function makeMicTools(en) {
   return wrap;
 }
 
-/* 🎙️ 연습 기록 요약: 내 습관 대화 문장들의 총 연습 횟수 · 평균 정확도 · 연습한 문장 수 */
+/* 🎙️ 연습 기록 요약: 만든 대화 문장들의 총 연습 횟수 · 평균 정확도 · 연습한 문장 수 */
 function practiceSentences() {
-  return mySets.filter(setComplete).flatMap(s => dialogLines(setAct(s), s.sel).map(l => l.en));
+  return myQs.filter(qDone).flatMap(q => dialogLines(qAct(q), q.sel).map(l => l.en));
 }
 function renderPracticeSummary() {
   const box = document.getElementById("practice-summary");
@@ -1312,16 +1312,16 @@ document.getElementById("stats-reset").addEventListener("click", () => {
 });
 
 /* ===========================================================
- * 🎤 컴퓨터와 미리 연습하기 (습관별 대화: 줄마다 말하기 + 역할극)
+ * 🎤 3. 연습하기 : 대화 카드마다 [🔊 대화 듣기] [🎙️ 연습하기] → 줄마다 말하기 + 🎭 역할극
  * =========================================================== */
-function makeSetCard(s, idx) {
-  const a = setAct(s);
-  const lines = dialogLines(a, s.sel);
+function makePracticeCard(q, idx) {
+  const a = qAct(q);
+  const lines = dialogLines(a, q.sel);
   const card = document.createElement("div");
   card.className = "pcard pcard-dialog";
   const top = document.createElement("div");
   top.className = "card-top";
-  top.innerHTML = `<div class="ptag-left"><span class="card-tag tag-combo">📅 습관 ${idx + 1}</span><span class="pset-title">${a.emoji} ${a.q}</span></div>`;
+  top.innerHTML = `<div class="ptag-left"><span class="card-tag tag-combo">질문 ${idx + 1}</span><span class="pset-title">${a.emoji} ${a.q}</span></div>`;
   card.appendChild(top);
   const body = document.createElement("div");
   const rows = lines.map(l => {
@@ -1334,26 +1334,42 @@ function makeSetCard(s, idx) {
     sp.addEventListener("click", () => speak(l.en));
     const txt = document.createElement("div");
     txt.className = "prow-text";
-    const w = document.createElement("span"); w.className = "prow-who"; w.textContent = l.who === "A" ? "🙋 묻는 사람" : "🙆 대답하는 사람";
+    const w = document.createElement("span"); w.className = "prow-who"; w.textContent = l.who === "A" ? "🙋 묻는 사람" : "🙆 대답하는 사람 (나)";
     const en = document.createElement("div"); en.className = "en"; en.appendChild(buildWords(l.en));
     const ko = document.createElement("div"); ko.className = "ko"; ko.textContent = l.ko;
     txt.append(w, en, ko);
     main.append(sp, txt);
-    const mic = makeMicTools(l.en);
-    row.append(main, mic);
-    row._who = l.who; row._en = l.en; row._mic = mic;
+    row.appendChild(main);
+    row._who = l.who; row._en = l.en;
     body.appendChild(row);
     return row;
   });
   const tools = document.createElement("div"); tools.className = "ptools";
   const roleNote = document.createElement("div"); roleNote.className = "role-note";
-  const allBtn = document.createElement("button");
-  allBtn.className = "btn small"; allBtn.textContent = "🔊 전체 듣기";
-  allBtn.addEventListener("click", () => playLines(rows, lines));
+  const listenBtn = document.createElement("button");
+  listenBtn.className = "btn small"; listenBtn.textContent = "🔊 대화 듣기";
+  listenBtn.addEventListener("click", () => playLines(rows, lines));
+  const practiceBtn = document.createElement("button");
+  practiceBtn.className = "btn primary practice-btn"; practiceBtn.textContent = "🎙️ 연습하기";
   const roleA = document.createElement("button");
-  roleA.className = "btn small primary"; roleA.textContent = "🎭 내가 묻는 사람";
+  roleA.className = "btn small primary"; roleA.textContent = "🎭 내가 묻는 사람"; roleA.hidden = true;
   const roleB = document.createElement("button");
-  roleB.className = "btn small primary"; roleB.textContent = "🎭 내가 대답하는 사람";
+  roleB.className = "btn small primary"; roleB.textContent = "🎭 내가 대답하는 사람"; roleB.hidden = true;
+
+  /* 🎙️ 연습하기 : 줄마다 말하기 버튼을 보여 줘요 (다시 누르면 접기) */
+  let open = false;
+  practiceBtn.addEventListener("click", () => {
+    open = !open;
+    card.classList.toggle("practicing", open);
+    rows.forEach(r => {
+      if (open && !r._mic) { r._mic = makeMicTools(r._en); r.appendChild(r._mic); }
+      if (r._mic) r._mic.hidden = !open;
+    });
+    roleA.hidden = roleB.hidden = !open;
+    practiceBtn.textContent = open ? "✖ 연습 접기" : "🎙️ 연습하기";
+    roleNote.textContent = open ? "🎙️ 줄마다 말하기를 눌러 연습해요. 익숙해지면 🎭 역할극에 도전!" : "";
+  });
+
   let playing = false;
   function rolePlay(me) {
     if (playing) return;
@@ -1381,7 +1397,7 @@ function makeSetCard(s, idx) {
   }
   roleA.addEventListener("click", () => rolePlay("A"));
   roleB.addEventListener("click", () => rolePlay("B"));
-  tools.append(allBtn, roleA, roleB);
+  tools.append(listenBtn, practiceBtn, roleA, roleB);
   card.append(body, tools, roleNote);
   return card;
 }
@@ -1393,17 +1409,20 @@ function speakThen(text, cb) {
   speak(text, null, null, () => { clearTimeout(timer); finish(); });
 }
 function renderPractice() {
+  updateBadges();
   renderPairCards();
   const empty = document.getElementById("practice-empty");
   const list = document.getElementById("practice-list");
   list.innerHTML = "";
-  const done = mySets.map((s, i) => [s, i]).filter(([s]) => setComplete(s));
+  const done = myQs.map((q, i) => [q, i]).filter(([q]) => qDone(q));
   empty.hidden = !!done.length;
-  done.forEach(([s, i]) => list.appendChild(makeSetCard(s, i)));
-  if (done.length && done.length < SET_COUNT) {
+  document.getElementById("practice-count").textContent = `${done.length}개 대화`;
+  done.forEach(([q, i]) => list.appendChild(makePracticeCard(q, i)));
+  const left = myQs.length - done.length;
+  if (done.length && left > 0) {
     const note = document.createElement("p");
     note.className = "practice-empty";
-    note.innerHTML = `아직 <b>${SET_COUNT - done.length}개</b> 습관이 비어 있어요. <b>📅 내 생활 습관 만들기</b>에서 마저 만들어 보세요.`;
+    note.innerHTML = `아직 대답하지 않은 질문이 <b>${left}개</b> 있어요. <b>✍️ 2. 대답 만들기</b>에서 마저 만들어 보세요.`;
     list.appendChild(note);
   }
   renderPracticeSummary();
@@ -1411,11 +1430,12 @@ function renderPractice() {
 
 /* ---------- 초기 렌더 ---------- */
 renderBook();
-renderCards();
-renderFreqFill();
+renderAskCards();
+renderPicked();
 renderReactions();
 renderLadder();
 renderBuilder();
+updateBadges();
 let quizStarted = false;
 
 /* ---------- 탭 전환 ---------- */
@@ -1429,7 +1449,8 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     synth.cancel();
     hidePopup();
     if (tab === "practice") renderPractice();
-    else if (tab === "build") renderBuilder();
+    else if (tab === "answer") renderBuilder();
+    else if (tab === "ask") { refreshAskCards(); renderPicked(); }
     else if (tab === "quiz" && !quizStarted) { quizStarted = true; startQuiz(); }
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
