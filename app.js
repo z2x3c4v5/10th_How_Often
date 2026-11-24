@@ -3,7 +3,7 @@
  * - 음성 출력: Web Speech API (SpeechSynthesis)
  * - 단어 클릭: 단어 발음 + 뜻 풍선(popup)
  * - 그림: Canva로 만든 활동 그림 images/활동id.png (없으면 이모지)
- * - ❓ 1. 질문 고르기(최대 5개, 📘 교과서 대화 포함) → ✍️ 2. 대답 만들기(수준·빈도, 📝 공책에 적기)
+ * - ❓ 1. 질문 고르기(최대 5개, 📘 교과서 대화 포함) → ✍️ 2. 대답 만들기(수준·빈도, 📝 워크시트에 적기)
  *   → 🎤 3. 연습하기(🎙️ 연습하기 · 🎭 역할극 · 👫 짝 활동 카드)
  * ========================================================= */
 
@@ -796,7 +796,7 @@ document.getElementById("go-practice").addEventListener("click", () => goTab("pr
 document.querySelectorAll(".go-ask").forEach(b => b.addEventListener("click", () => goTab("ask")));
 document.querySelectorAll(".go-answer").forEach(b => b.addEventListener("click", () => goTab("answer")));
 
-/* 📝 공책에 적기 */
+/* 📝 워크시트에 적기 (워크시트 2번 표와 같은 순서) */
 function sheetRow(label, en, ko) {
   const row = document.createElement("div");
   row.className = "sheet-row" + (en ? "" : " empty");
