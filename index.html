@@ -24,7 +24,7 @@
   </div>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="ask">❓ <span class="tab-long">1. 질문 고르기</span><span class="tab-short">1. 질문</span> <span id="q-count" class="tab-count">0/5</span></button>
+    <button class="tab-btn active" data-tab="ask">❓ <span class="tab-long">1. 질문 고르기</span><span class="tab-short">1. 질문</span> <span id="q-count" class="tab-count">0/3</span></button>
     <button class="tab-btn" data-tab="answer">✍️ <span class="tab-long">2. 대답 만들기</span><span class="tab-short">2. 대답</span> <span id="a-count" class="tab-count">0/0</span></button>
     <button class="tab-btn" data-tab="practice">🎤 <span class="tab-long">3. 연습하기</span><span class="tab-short">3. 연습</span></button>
   </nav>
@@ -54,7 +54,7 @@
       <div class="section-block">
         <h2>❓ 1. 질문 고르기 · How often do you ___? <span class="count" id="card-count"></span></h2>
         <div class="cat-switch" id="card-cats"></div>
-        <p class="hint"><b>📋 워크시트 1번</b>: 질문을 듣고 따라 말한 뒤, 친구에게 물어보고 싶은 질문을 <b>최대 5개</b> 골라요. 카드의 <b>✅ 이 질문 고르기</b>를 누르면 아래 <b>고른 질문</b>에 담기고, 다시 누르면 빠져요. <b>📘</b> 는 교과서 표현, <b>🧒</b> 는 우리 생활 표현이에요. 단어를 누르면 뜻과 발음을 알 수 있어요.</p>
+        <p class="hint"><b>📋 워크시트 1번</b>: 질문을 듣고 따라 말한 뒤, 친구에게 물어볼 <b>교과서 밖 질문 3개</b>를 골라요. <b>📘 교과서 질문</b>은 듣고 따라 말하기만 하고, <b>🧒 우리 생활 · 🍎 건강 · 🏠 집·공부 · ⚽ 운동·취미 · 👨‍👩‍👧 나들이</b> 질문에서 <b>✅ 이 질문 고르기</b>를 눌러요. 다시 누르면 빠져요. 단어를 누르면 뜻과 발음을 알 수 있어요.</p>
         <div id="card-grid" class="card-grid five q-grid"></div>
       </div>
       <div class="picked-bar" id="picked-bar"></div>
@@ -102,7 +102,7 @@
       </details>
       <div class="section-block">
         <h2>📝 워크시트에 적기 <span class="count">워크시트 2번</span></h2>
-        <p class="hint"><b>📋 워크시트 2번</b> 표(질문 1 ~ 질문 5)와 같은 순서예요. 질문과 내 대답을 보고 그대로 옮겨 적어요. 🔊를 누르면 읽어 줘요.</p>
+        <p class="hint"><b>📋 워크시트 2번</b> 표와 같은 순서(질문 1 → 대답 1 → 질문 2 → 대답 2 → 질문 3 → 대답 3)예요. 질문 칸과 대답 칸에 나누어 그대로 옮겨 적어요. 🔊를 누르면 읽어 줘요.</p>
         <div id="sheet-summary" class="sheet-table"></div>
         <div class="fill-actions"><button id="go-practice" class="btn primary big" disabled>🎤 3. 연습하러 가기 ▶</button></div>
       </div>
@@ -124,7 +124,7 @@
       </div>
       <div class="section-block">
         <h2>👫 짝 활동 카드 <span class="count">워크시트 3번</span></h2>
-        <p class="hint"><b>📋 워크시트 3번</b>: 내 질문 5개 중 두 개를 골라 워크시트 위 칸에 적어요. 혼자 연습했으면 친구를 만날 때마다 <b>How often do you ___?</b> 로 물어보고, 친구의 대답(몇 번 · 언제마다)을 적어요. 친구가 자주 하면 <b>Good for you!</b>, 조금 하면 <b>You should ___ more often.</b> 이라고 말해 줘요. 내가 대답할 때는 <b>내 대답</b>을 말해요.</p>
+        <p class="hint"><b>📋 워크시트 3번</b>: 내 질문 3개 중 두 개를 골라 워크시트 위 칸에 적어요. 혼자 연습했으면 친구를 만날 때마다 <b>How often do you ___?</b> 로 물어보고, 친구의 대답(몇 번 · 언제마다)을 적어요. 친구가 자주 하면 <b>Good for you!</b>, 조금 하면 <b>You should ___ more often.</b> 이라고 말해 줘요. 내가 대답할 때는 <b>내 대답</b>을 말해요.</p>
         <div id="pair-cards" class="pair-cards"></div>
       </div>
     </section>

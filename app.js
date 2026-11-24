@@ -3,7 +3,7 @@
  * - 음성 출력: Web Speech API (SpeechSynthesis)
  * - 단어 클릭: 단어 발음 + 뜻 풍선(popup)
  * - 그림: Canva로 만든 활동 그림 images/활동id.png (없으면 이모지)
- * - ❓ 1. 질문 고르기(최대 5개, 📘 교과서 대화 포함) → ✍️ 2. 대답 만들기(수준·빈도, 📝 워크시트에 적기)
+ * - ❓ 1. 질문 고르기(교과서 밖 질문 3개, 📘 교과서 질문은 듣기용) → ✍️ 2. 대답 만들기(수준·빈도, 📝 워크시트에 적기)
  *   → 🎤 3. 연습하기(🎙️ 연습하기 · 🎭 역할극 · 👫 짝 활동 카드)
  * ========================================================= */
 
@@ -520,7 +520,7 @@ function makeCard(item, opts) {
  * 내가 고른 질문과 대답 (저장)
  *  myQs = [{ id, level, sel }]  — 1. 질문 고르기에서 담고, 2. 대답 만들기에서 sel 을 채워요
  * =========================================================== */
-const MAX_Q = 5;
+const MAX_Q = 3;   // 워크시트 2번: 교과서 밖 질문 3개
 let mode = "basic";       // 🌱 초급 · 🌿 중급 (맨 위 탭)
 let qaStore = { basic: [], mid: [] };
 try {
@@ -530,7 +530,7 @@ try {
   mode = localStorage.getItem("howoften_mode") === "mid" ? "mid" : "basic";
 } catch (e) {}
 ["basic", "mid"].forEach(k => {
-  qaStore[k] = (Array.isArray(qaStore[k]) ? qaStore[k] : []).filter(q => q && findAct(q.id)).slice(0, MAX_Q)
+  qaStore[k] = (Array.isArray(qaStore[k]) ? qaStore[k] : []).filter(q => q && findAct(q.id) && !findAct(q.id).book).slice(0, MAX_Q)
     .map(q => ({ id: q.id, sel: fitSel(q.sel || {}, k) }));
 });
 let myQs = qaStore[mode];
@@ -553,6 +553,7 @@ function goTab(tab) { document.querySelector(`.tab-btn[data-tab="${tab}"]`).clic
 let cardCat = "all";
 const CARD_CATS = [{ key: "all", label: "전체" }, { key: "book", label: "📘 교과서 표현" }, { key: "life", label: "🧒 우리 생활 20" }, ...ACT_CATS];
 function toggleQuestion(a) {
+  if (a.book) { speak(questionEn(a)); toast("📘 교과서 질문은 듣고 따라 말해요. 교과서 밖 질문 3개를 골라요!"); return; }
   const i = myQs.findIndex(q => q.id === a.id);
   if (i >= 0) {
     myQs.splice(i, 1);
@@ -575,6 +576,7 @@ function refreshAskCards() {
     c.classList.toggle("picked", on);
     const b = c.querySelector(".pick-btn");
     b.classList.toggle("on", on);
+    if (findAct(c.dataset.act).book) { b.classList.add("book-only"); b.textContent = "📘 교과서 질문 · 듣고 따라 말하기"; return; }
     b.textContent = on ? `✓ 고른 질문 ${myQs.findIndex(q => q.id === c.dataset.act) + 1} (빼기)` : "✅ 이 질문 고르기";
   });
 }
@@ -820,7 +822,7 @@ function renderSheetSummary() {
   myQs.forEach((q, i) => {
     const a = qAct(q), ok = qDone(q);
     box.appendChild(sheetRow(`질문 ${i + 1}`, questionEn(a), questionKo(a)));
-    box.appendChild(sheetRow(`내 대답 ${i + 1}`, ok && answerEn(a, q.sel), ok && answerKo(a, q.sel)));
+    box.appendChild(sheetRow(`대답 ${i + 1}`, ok && answerEn(a, q.sel), ok && answerKo(a, q.sel)));
   });
 }
 
